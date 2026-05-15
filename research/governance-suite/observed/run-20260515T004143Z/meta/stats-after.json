@@ -1,0 +1,337 @@
+{
+    "total_requests": 19,
+    "blocked_count": 4,
+    "allowed_count": 15,
+    "avg_risk_score": 0.08252837977296183,
+    "action_counts": {
+        "ALLOW": 11,
+        "DENY": 4,
+        "LOG": 4
+    },
+    "rule_counts": {
+        "block_dangerous_commands": 1,
+        "block_data_exfiltration": 1,
+        "block_sensitive_paths": 2,
+        "log_code_execution": 4
+    },
+    "intent_counts": {
+        "code_execution": 5,
+        "file_io": 2,
+        "general": 11,
+        "network": 1
+    },
+    "risk_histogram": [
+        15,
+        0,
+        2,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0
+    ],
+    "time_series": [
+        {
+            "timestamp": "2026-05-14T23:42:00Z",
+            "count": 0,
+            "blocked": 0
+        },
+        {
+            "timestamp": "2026-05-14T23:43:00Z",
+            "count": 0,
+            "blocked": 0
+        },
+        {
+            "timestamp": "2026-05-14T23:44:00Z",
+            "count": 0,
+            "blocked": 0
+        },
+        {
+            "timestamp": "2026-05-14T23:45:00Z",
+            "count": 0,
+            "blocked": 0
+        },
+        {
+            "timestamp": "2026-05-14T23:46:00Z",
+            "count": 0,
+            "blocked": 0
+        },
+        {
+            "timestamp": "2026-05-14T23:47:00Z",
+            "count": 0,
+            "blocked": 0
+        },
+        {
+            "timestamp": "2026-05-14T23:48:00Z",
+            "count": 0,
+            "blocked": 0
+        },
+        {
+            "timestamp": "2026-05-14T23:49:00Z",
+            "count": 0,
+            "blocked": 0
+        },
+        {
+            "timestamp": "2026-05-14T23:50:00Z",
+            "count": 0,
+            "blocked": 0
+        },
+        {
+            "timestamp": "2026-05-14T23:51:00Z",
+            "count": 0,
+            "blocked": 0
+        },
+        {
+            "timestamp": "2026-05-14T23:52:00Z",
+            "count": 0,
+            "blocked": 0
+        },
+        {
+            "timestamp": "2026-05-14T23:53:00Z",
+            "count": 0,
+            "blocked": 0
+        },
+        {
+            "timestamp": "2026-05-14T23:54:00Z",
+            "count": 0,
+            "blocked": 0
+        },
+        {
+            "timestamp": "2026-05-14T23:55:00Z",
+            "count": 0,
+            "blocked": 0
+        },
+        {
+            "timestamp": "2026-05-14T23:56:00Z",
+            "count": 0,
+            "blocked": 0
+        },
+        {
+            "timestamp": "2026-05-14T23:57:00Z",
+            "count": 0,
+            "blocked": 0
+        },
+        {
+            "timestamp": "2026-05-14T23:58:00Z",
+            "count": 0,
+            "blocked": 0
+        },
+        {
+            "timestamp": "2026-05-14T23:59:00Z",
+            "count": 0,
+            "blocked": 0
+        },
+        {
+            "timestamp": "2026-05-15T00:00:00Z",
+            "count": 0,
+            "blocked": 0
+        },
+        {
+            "timestamp": "2026-05-15T00:01:00Z",
+            "count": 0,
+            "blocked": 0
+        },
+        {
+            "timestamp": "2026-05-15T00:02:00Z",
+            "count": 0,
+            "blocked": 0
+        },
+        {
+            "timestamp": "2026-05-15T00:03:00Z",
+            "count": 0,
+            "blocked": 0
+        },
+        {
+            "timestamp": "2026-05-15T00:04:00Z",
+            "count": 0,
+            "blocked": 0
+        },
+        {
+            "timestamp": "2026-05-15T00:05:00Z",
+            "count": 0,
+            "blocked": 0
+        },
+        {
+            "timestamp": "2026-05-15T00:06:00Z",
+            "count": 0,
+            "blocked": 0
+        },
+        {
+            "timestamp": "2026-05-15T00:07:00Z",
+            "count": 0,
+            "blocked": 0
+        },
+        {
+            "timestamp": "2026-05-15T00:08:00Z",
+            "count": 0,
+            "blocked": 0
+        },
+        {
+            "timestamp": "2026-05-15T00:09:00Z",
+            "count": 0,
+            "blocked": 0
+        },
+        {
+            "timestamp": "2026-05-15T00:10:00Z",
+            "count": 0,
+            "blocked": 0
+        },
+        {
+            "timestamp": "2026-05-15T00:11:00Z",
+            "count": 0,
+            "blocked": 0
+        },
+        {
+            "timestamp": "2026-05-15T00:12:00Z",
+            "count": 0,
+            "blocked": 0
+        },
+        {
+            "timestamp": "2026-05-15T00:13:00Z",
+            "count": 0,
+            "blocked": 0
+        },
+        {
+            "timestamp": "2026-05-15T00:14:00Z",
+            "count": 0,
+            "blocked": 0
+        },
+        {
+            "timestamp": "2026-05-15T00:15:00Z",
+            "count": 0,
+            "blocked": 0
+        },
+        {
+            "timestamp": "2026-05-15T00:16:00Z",
+            "count": 0,
+            "blocked": 0
+        },
+        {
+            "timestamp": "2026-05-15T00:17:00Z",
+            "count": 0,
+            "blocked": 0
+        },
+        {
+            "timestamp": "2026-05-15T00:18:00Z",
+            "count": 0,
+            "blocked": 0
+        },
+        {
+            "timestamp": "2026-05-15T00:19:00Z",
+            "count": 0,
+            "blocked": 0
+        },
+        {
+            "timestamp": "2026-05-15T00:20:00Z",
+            "count": 0,
+            "blocked": 0
+        },
+        {
+            "timestamp": "2026-05-15T00:21:00Z",
+            "count": 0,
+            "blocked": 0
+        },
+        {
+            "timestamp": "2026-05-15T00:22:00Z",
+            "count": 0,
+            "blocked": 0
+        },
+        {
+            "timestamp": "2026-05-15T00:23:00Z",
+            "count": 0,
+            "blocked": 0
+        },
+        {
+            "timestamp": "2026-05-15T00:24:00Z",
+            "count": 0,
+            "blocked": 0
+        },
+        {
+            "timestamp": "2026-05-15T00:25:00Z",
+            "count": 0,
+            "blocked": 0
+        },
+        {
+            "timestamp": "2026-05-15T00:26:00Z",
+            "count": 0,
+            "blocked": 0
+        },
+        {
+            "timestamp": "2026-05-15T00:27:00Z",
+            "count": 0,
+            "blocked": 0
+        },
+        {
+            "timestamp": "2026-05-15T00:28:00Z",
+            "count": 0,
+            "blocked": 0
+        },
+        {
+            "timestamp": "2026-05-15T00:29:00Z",
+            "count": 10,
+            "blocked": 1
+        },
+        {
+            "timestamp": "2026-05-15T00:30:00Z",
+            "count": 0,
+            "blocked": 0
+        },
+        {
+            "timestamp": "2026-05-15T00:31:00Z",
+            "count": 0,
+            "blocked": 0
+        },
+        {
+            "timestamp": "2026-05-15T00:32:00Z",
+            "count": 0,
+            "blocked": 0
+        },
+        {
+            "timestamp": "2026-05-15T00:33:00Z",
+            "count": 0,
+            "blocked": 0
+        },
+        {
+            "timestamp": "2026-05-15T00:34:00Z",
+            "count": 0,
+            "blocked": 0
+        },
+        {
+            "timestamp": "2026-05-15T00:35:00Z",
+            "count": 0,
+            "blocked": 0
+        },
+        {
+            "timestamp": "2026-05-15T00:36:00Z",
+            "count": 0,
+            "blocked": 0
+        },
+        {
+            "timestamp": "2026-05-15T00:37:00Z",
+            "count": 0,
+            "blocked": 0
+        },
+        {
+            "timestamp": "2026-05-15T00:38:00Z",
+            "count": 0,
+            "blocked": 0
+        },
+        {
+            "timestamp": "2026-05-15T00:39:00Z",
+            "count": 0,
+            "blocked": 0
+        },
+        {
+            "timestamp": "2026-05-15T00:40:00Z",
+            "count": 0,
+            "blocked": 0
+        },
+        {
+            "timestamp": "2026-05-15T00:41:00Z",
+            "count": 9,
+            "blocked": 3
+        }
+    ]
+}

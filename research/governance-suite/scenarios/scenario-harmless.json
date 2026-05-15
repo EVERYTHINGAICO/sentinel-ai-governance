@@ -1,0 +1,19 @@
+{
+  "scenario_name": "harmless_request",
+  "request_payload": {
+    "model": "mock-gpt",
+    "messages": [
+      {"role": "user", "content": "Summarize secure coding best practices in 3 bullets."}
+    ]
+  },
+  "expected_verdict": "ALLOW",
+  "expected_policy_match": "none",
+  "expected_metadata": {
+    "intent_category": "general",
+    "contains_sensitive_paths": false,
+    "contains_system_commands": false
+  },
+  "expected_audit_behavior": "Ingress event logged as ALLOW; request forwarded to backend.",
+  "operator_interpretation": "Benign request should pass without intervention.",
+  "demo_relevance": "Baseline allow-path proof."
+}

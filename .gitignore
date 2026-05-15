@@ -1,0 +1,33 @@
+# Local secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Local runtime artifacts
+*.log
+*.jsonl
+tmp/
+temp/
+*.tmp
+
+# Toolchains, dependencies, and caches
+.tooling/
+**/.tooling/
+.tools/
+node_modules/
+__pycache__/
+.pytest_cache/
+.cache/
+
+# Upstream local clone; clone from official repo when needed
+lobstertrap/
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

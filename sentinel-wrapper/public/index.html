@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SENTINEL Governance Demo</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-copy">
+      <p class="eyebrow">Hackathon MVP · replay-based evidence</p>
+      <h1>SENTINEL</h1>
+      <h2>AI Agent Governance above Lobster Trap Enforcement</h2>
+      <p class="hero-text">SENTINEL turns Lobster Trap security events into review-ready governance decisions that a human operator can understand in seconds.</p>
+      <a class="primary-action" href="#demo">Start Demo</a>
+    </div>
+    <div class="hero-status">
+      <span id="modeBadge">Mode: loading</span>
+      <strong>Key demo moment</strong>
+      <p>Lobster Trap allows an ambiguous request. SENTINEL recommends human review.</p>
+    </div>
+  </header>
+
+  <section class="how-it-works" aria-label="How this demo works">
+    <div>
+      <span>1</span>
+      <h3>Lobster Trap</h3>
+      <p>Enforcement engine: inspects prompts, applies policies, and emits verdict metadata.</p>
+    </div>
+    <div>
+      <span>2</span>
+      <h3>Gemini</h3>
+      <p>Reasoning layer: converts governance events into operator-facing explanations.</p>
+    </div>
+    <div>
+      <span>3</span>
+      <h3>SENTINEL</h3>
+      <p>Workflow layer: recommends review actions and preserves audit intelligence.</p>
+    </div>
+  </section>
+
+  <section class="demo-instructions" aria-label="How to use this demo">
+    <div class="section-heading">
+      <p class="eyebrow">How to use this demo</p>
+      <h2>Follow the incident walkthrough</h2>
+    </div>
+    <ol>
+      <li>Pick an incident from the left.</li>
+      <li>Read what the AI agent attempted.</li>
+      <li>Compare Lobster Trap's enforcement verdict with SENTINEL's governance recommendation.</li>
+      <li>Choose an operator review state.</li>
+      <li>Open Technical Evidence only if you want raw metadata.</li>
+    </ol>
+  </section>
+
+  <main class="layout" id="demo">
+    <section class="panel list-panel">
+      <div class="section-heading">
+        <p class="eyebrow">Guided demo order</p>
+        <h2>Try these incidents</h2>
+      </div>
+      <div class="toolbar">
+        <input id="searchInput" type="text" placeholder="Search scenario or rule" />
+        <select id="verdictFilter">
+          <option value="">All verdicts</option>
+          <option value="ALLOW">ALLOW</option>
+          <option value="DENY">DENY</option>
+        </select>
+      </div>
+      <div id="scenarioList"></div>
+    </section>
+
+    <section class="panel detail-panel" id="detailPanel">
+      <p class="eyebrow">Incident walkthrough</p>
+      <h2 id="detailTitle">Select a scenario</h2>
+      <p id="detailPrompt" class="prompt"></p>
+      <div id="ambiguousHighlight" class="highlight hidden"></div>
+
+      <div class="card">
+        <h3>Demo Intelligence Snapshot</h3>
+        <div id="intelligenceSummary" class="stats-grid"></div>
+      </div>
+
+      <div class="narrative-grid">
+        <div>
+          <h3>What happened?</h3>
+          <p id="whatHappened"></p>
+        </div>
+        <div>
+          <h3>What did Lobster Trap decide?</h3>
+          <p id="lobsterDecision"></p>
+        </div>
+        <div>
+          <h3>What does SENTINEL recommend?</h3>
+          <p id="sentinelDecision"></p>
+        </div>
+        <div>
+          <h3>What should the operator do?</h3>
+          <p id="operatorAction"></p>
+        </div>
+      </div>
+
+      <div class="grid2">
+        <div class="card">
+          <h3>Verdict Comparison</h3>
+          <div id="verdictComparison"></div>
+        </div>
+        <div class="card">
+          <h3>SENTINEL Recommendation</h3>
+          <div id="sentinelRecommendation"></div>
+          <div class="state-controls">
+            <p>This simulates what a human operator would decide after reviewing the governance recommendation.</p>
+            <label for="reviewState"><strong>Operator review state</strong></label>
+            <select id="reviewState">
+              <option value="Needs Review">Needs Review</option>
+              <option value="Approved">Approved</option>
+              <option value="Rejected">Rejected</option>
+              <option value="Quarantined">Quarantined</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid2">
+        <div class="card">
+          <h3>Audit/Event Evidence</h3>
+          <div id="evidenceBox"></div>
+        </div>
+        <div class="card">
+          <h3>Track Alignment</h3>
+          <div id="trackAlignment"></div>
+        </div>
+      </div>
+
+      <details class="technical-evidence">
+        <summary>Technical Evidence</summary>
+        <pre id="metadataBox"></pre>
+      </details>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

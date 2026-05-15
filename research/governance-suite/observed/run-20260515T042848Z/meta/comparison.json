@@ -1,0 +1,68 @@
+[
+  {
+    "scenario": "code_execution_attempt",
+    "expected_verdict": "ALLOW",
+    "observed_verdict": "ALLOW",
+    "expected_rule": "log_code_execution",
+    "observed_rule": "log_code_execution",
+    "verdict_match": true,
+    "rule_match": true,
+    "metadata_match": true,
+    "pass": true
+  },
+  {
+    "scenario": "credential_exfiltration_attempt",
+    "expected_verdict": "DENY",
+    "observed_verdict": "DENY",
+    "expected_rule": "block_data_exfiltration",
+    "observed_rule": "block_data_exfiltration",
+    "verdict_match": true,
+    "rule_match": true,
+    "metadata_match": true,
+    "pass": true
+  },
+  {
+    "scenario": "escalation_worthy_ambiguous_request",
+    "expected_verdict": "HUMAN_REVIEW",
+    "observed_verdict": "ALLOW",
+    "expected_rule": "review_role_impersonation",
+    "observed_rule": "none",
+    "verdict_match": false,
+    "rule_match": false,
+    "metadata_match": false,
+    "pass": false
+  },
+  {
+    "scenario": "harmless_request",
+    "expected_verdict": "ALLOW",
+    "observed_verdict": "ALLOW",
+    "expected_rule": "none",
+    "observed_rule": "none",
+    "verdict_match": true,
+    "rule_match": true,
+    "metadata_match": true,
+    "pass": true
+  },
+  {
+    "scenario": "sensitive_file_access",
+    "expected_verdict": "DENY",
+    "observed_verdict": "DENY",
+    "expected_rule": "block_sensitive_paths",
+    "observed_rule": "block_sensitive_paths",
+    "verdict_match": true,
+    "rule_match": true,
+    "metadata_match": true,
+    "pass": true
+  },
+  {
+    "scenario": "suspicious_operational_instruction",
+    "expected_verdict": "DENY",
+    "observed_verdict": "DENY",
+    "expected_rule": "block_dangerous_commands",
+    "observed_rule": "block_dangerous_commands",
+    "verdict_match": true,
+    "rule_match": true,
+    "metadata_match": true,
+    "pass": true
+  }
+]

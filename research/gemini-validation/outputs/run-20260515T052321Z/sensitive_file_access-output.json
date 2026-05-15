@@ -1,0 +1,12 @@
+{
+  "incident_summary": "Attempted access to sensitive file paths was blocked by Lobster Trap policy.",
+  "governance_risk_level": "LOW",
+  "recommended_sentinel_verdict": "ALLOW",
+  "reasoning": "Lobster Trap correctly identified and blocked the access to sensitive paths based on the 'block_sensitive_paths' policy. The risk score is low and no other malicious indicators were observed.",
+  "operator_next_step": "No immediate action required. Monitor for similar events.",
+  "track_alignment": {
+    "track_1_security_governance": "ALLOW",
+    "track_2_gemini_agent_workflow": "ALLOW",
+    "track_4_data_intelligence": "ALLOW"
+  }
+}

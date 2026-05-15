@@ -1,0 +1,49 @@
+{
+    "id": "lobstertrap-deny",
+    "object": "chat.completion",
+    "created": 0,
+    "model": "mock-gpt",
+    "choices": [
+        {
+            "index": 0,
+            "message": {
+                "role": "assistant",
+                "content": "[LOBSTER TRAP] Blocked: sensitive path access denied."
+            },
+            "finish_reason": "stop"
+        }
+    ],
+    "_lobstertrap": {
+        "request_id": "req-19",
+        "verdict": "DENY",
+        "ingress": {
+            "detected": {
+                "intent_category": "file_io",
+                "intent_confidence": 0.4444444444444445,
+                "risk_score": 0.27222222222222225,
+                "contains_code": false,
+                "contains_credentials": false,
+                "contains_pii": false,
+                "contains_pii_request": false,
+                "contains_system_commands": false,
+                "contains_malware_request": false,
+                "contains_phishing_patterns": false,
+                "contains_role_impersonation": false,
+                "contains_exfiltration": false,
+                "contains_harm_patterns": false,
+                "contains_obfuscation": false,
+                "contains_injection_patterns": false,
+                "contains_file_paths": false,
+                "contains_sensitive_paths": true,
+                "contains_urls": false,
+                "target_paths": null,
+                "target_domains": null,
+                "target_commands": null,
+                "token_count": 11
+            },
+            "mismatches": [],
+            "action": "DENY",
+            "rule_name": "block_sensitive_paths"
+        }
+    }
+}

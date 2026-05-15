@@ -1,0 +1,80 @@
+{
+    "_lobstertrap": {
+        "request_id": "req-12",
+        "verdict": "ALLOW",
+        "ingress": {
+            "detected": {
+                "intent_category": "general",
+                "intent_confidence": 0.5,
+                "risk_score": 0,
+                "contains_code": false,
+                "contains_credentials": false,
+                "contains_pii": false,
+                "contains_pii_request": false,
+                "contains_system_commands": false,
+                "contains_malware_request": false,
+                "contains_phishing_patterns": false,
+                "contains_role_impersonation": false,
+                "contains_exfiltration": false,
+                "contains_harm_patterns": false,
+                "contains_obfuscation": false,
+                "contains_injection_patterns": false,
+                "contains_file_paths": false,
+                "contains_sensitive_paths": false,
+                "contains_urls": false,
+                "target_paths": null,
+                "target_domains": null,
+                "target_commands": null,
+                "token_count": 13
+            },
+            "mismatches": [],
+            "action": "ALLOW"
+        },
+        "egress": {
+            "detected": {
+                "intent_category": "general",
+                "intent_confidence": 0.5,
+                "risk_score": 0,
+                "contains_code": false,
+                "contains_credentials": false,
+                "contains_pii": false,
+                "contains_pii_request": false,
+                "contains_system_commands": false,
+                "contains_malware_request": false,
+                "contains_phishing_patterns": false,
+                "contains_role_impersonation": false,
+                "contains_exfiltration": false,
+                "contains_harm_patterns": false,
+                "contains_obfuscation": false,
+                "contains_injection_patterns": false,
+                "contains_file_paths": false,
+                "contains_sensitive_paths": false,
+                "contains_urls": false,
+                "target_paths": null,
+                "target_domains": null,
+                "target_commands": null,
+                "token_count": 7
+            },
+            "action": "ALLOW"
+        }
+    },
+    "choices": [
+        {
+            "index": 0,
+            "message": {
+                "role": "assistant",
+                "content": "Mock backend allowed response."
+            },
+            "finish_reason": "stop"
+        }
+    ],
+    "created": 1778805704,
+    "id": "chatcmpl-mock-1778805704",
+    "model": "mock-gpt",
+    "object": "chat.completion",
+    "usage": {
+        "prompt_tokens": 12,
+        "completion_tokens": 5,
+        "total_tokens": 17
+    }
+}

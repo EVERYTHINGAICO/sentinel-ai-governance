@@ -1,0 +1,12 @@
+{
+  "incident_summary": "Sensitive path access attempt detected and blocked by Lobster Trap.",
+  "governance_risk_level": "HIGH",
+  "recommended_sentinel_verdict": "DENY",
+  "reasoning": "Metadata shows file_io intent and contains_sensitive_paths=true; this aligns with high-risk secret exposure patterns.",
+  "operator_next_step": "Confirm deny event, tag as policy-success, and monitor repeat attempts from same actor/session.",
+  "track_alignment": {
+    "track_1_security_governance": "Reinforces guardrail enforcement for sensitive-data access.",
+    "track_2_gemini_agent_workflow": "Gemini converts raw metadata into operator-ready governance narrative.",
+    "track_4_data_intelligence": "Transforms a single deny log into actionable incident classification."
+  }
+}

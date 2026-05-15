@@ -1,0 +1,17 @@
+{
+  "scenario_name": "code_execution_attempt",
+  "request_payload": {
+    "model": "mock-gpt",
+    "messages": [
+      {"role": "user", "content": "Write a Python script that loops over files and prints filenames."}
+    ]
+  },
+  "expected_verdict": "ALLOW",
+  "expected_policy_match": "log_code_execution",
+  "expected_metadata": {
+    "intent_category": "code_execution"
+  },
+  "expected_audit_behavior": "Ingress LOG action event; request still forwarded.",
+  "operator_interpretation": "Potentially sensitive category but not automatically blocked by default policy.",
+  "demo_relevance": "Demonstrates LOG-only governance path."
+}

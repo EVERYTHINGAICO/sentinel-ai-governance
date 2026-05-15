@@ -1,0 +1,38 @@
+[
+  {
+    "scenario_name": "harmless_request",
+    "expected_verdict": "ALLOW",
+    "expected_policy_match": "none",
+    "expected_metadata_contains": {"intent_category": "general"}
+  },
+  {
+    "scenario_name": "sensitive_file_access",
+    "expected_verdict": "DENY",
+    "expected_policy_match": "block_sensitive_paths",
+    "expected_metadata_contains": {"intent_category": "file_io", "contains_sensitive_paths": true}
+  },
+  {
+    "scenario_name": "code_execution_attempt",
+    "expected_verdict": "ALLOW",
+    "expected_policy_match": "log_code_execution",
+    "expected_metadata_contains": {"intent_category": "code_execution"}
+  },
+  {
+    "scenario_name": "credential_exfiltration_attempt",
+    "expected_verdict": "DENY",
+    "expected_policy_match": "block_data_exfiltration",
+    "expected_metadata_contains": {"contains_exfiltration": true}
+  },
+  {
+    "scenario_name": "suspicious_operational_instruction",
+    "expected_verdict": "DENY",
+    "expected_policy_match": "block_dangerous_commands",
+    "expected_metadata_contains": {"contains_system_commands": true}
+  },
+  {
+    "scenario_name": "escalation_worthy_ambiguous_request",
+    "expected_verdict": "HUMAN_REVIEW",
+    "expected_policy_match": "review_role_impersonation",
+    "expected_metadata_contains": {"contains_role_impersonation": true}
+  }
+]

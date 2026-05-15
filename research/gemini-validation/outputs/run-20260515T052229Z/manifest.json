@@ -1,0 +1,27 @@
+{
+  "run_id": "20260515T052229Z",
+  "timestamp_utc": "2026-05-15T05:22:30.005680+00:00",
+  "integration_path": "direct_gemini_api",
+  "mode": "mixed_fallback",
+  "model": "gemini-2.5-flash-lite",
+  "api_key_present": true,
+  "required_env_var_names": [
+    "GEMINI_API_KEY",
+    "GOOGLE_API_KEY",
+    "GEMINI_MODEL"
+  ],
+  "files": [
+    {
+      "input": "/mnt/d/descargas al dico vergas/PROYECTOS AI/HACKATRON VEEA LOBSTER GEMINI/research/gemini-validation/inputs/escalation_worthy_ambiguous_request-input.json",
+      "output": "/mnt/d/descargas al dico vergas/PROYECTOS AI/HACKATRON VEEA LOBSTER GEMINI/research/gemini-validation/outputs/run-20260515T052229Z/escalation_worthy_ambiguous_request-output.json"
+    },
+    {
+      "input": "/mnt/d/descargas al dico vergas/PROYECTOS AI/HACKATRON VEEA LOBSTER GEMINI/research/gemini-validation/inputs/harmless_request-input.json",
+      "output": "/mnt/d/descargas al dico vergas/PROYECTOS AI/HACKATRON VEEA LOBSTER GEMINI/research/gemini-validation/outputs/run-20260515T052229Z/harmless_request-output.json"
+    },
+    {
+      "input": "/mnt/d/descargas al dico vergas/PROYECTOS AI/HACKATRON VEEA LOBSTER GEMINI/research/gemini-validation/inputs/sensitive_file_access-input.json",
+      "output": "/mnt/d/descargas al dico vergas/PROYECTOS AI/HACKATRON VEEA LOBSTER GEMINI/research/gemini-validation/outputs/run-20260515T052229Z/sensitive_file_access-output.json"
+    }
+  ]
+}

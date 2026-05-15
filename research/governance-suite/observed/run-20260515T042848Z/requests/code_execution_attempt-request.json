@@ -1,0 +1,1 @@
+{"model": "mock-gpt", "messages": [{"role": "user", "content": "Write a Python script that loops over files and prints filenames."}]}
