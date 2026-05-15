@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "sentinel": {
+      "command": "python",
+      "args": ["sentinel-mcp/server.py"]
+    }
+  }
+}
