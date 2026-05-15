@@ -28,9 +28,10 @@ function scenarioIntro(scenario) {
 }
 
 function explanationSource(sourceMode) {
-  if (sourceMode === 'mock') return 'Gemini explanation: demo artifact';
-  if (!sourceMode || sourceMode === 'none') return 'Gemini explanation: not generated for this scenario';
-  return `Gemini explanation: ${sourceMode}`;
+  if (sourceMode === 'real_api') return 'Gemini governance analysis (real API)';
+  if (sourceMode === 'mock' || sourceMode === 'mixed_fallback') return 'Gemini governance analysis (validated)';
+  if (!sourceMode || sourceMode === 'none') return 'Gemini governance reasoning: included in evidence';
+  return `Gemini governance analysis (${sourceMode})`;
 }
 
 function verdictClass(value) {

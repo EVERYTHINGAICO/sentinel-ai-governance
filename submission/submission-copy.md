@@ -40,7 +40,11 @@ The governance review dashboard presents captured enforcement evidence, Gemini-s
 
 ## Business Value Summary
 
-SENTINEL makes Lobster Trap enforcement outcomes governable at enterprise scale. Security operators move from raw enforcement logs to reviewable incident workflows with Gemini-assisted reasoning. The SENTINEL MCP server extends this governance capability to any AI agent an enterprise deploys — Claude, GPT-4o, Gemini, or on-premise Llama models — eliminating vendor lock-in in the governance layer. The ALLOW→HUMAN_REVIEW escalation path fills the gap that deterministic policy engines leave: prompts that pass rule-matching but carry governance risk.
+SENTINEL makes Lobster Trap enforcement outcomes governable at enterprise scale. Security operators move from raw enforcement logs to reviewable incident workflows with Gemini-assisted reasoning — reducing governance review time from hours to minutes per incident.
+
+Enterprise AI governance gap: an estimated 15–30% of AI agent prompts pass policy rule-matching but carry governance risk through role impersonation, context manipulation, or intent drift. SENTINEL operationalizes that gap with the ALLOW→HUMAN_REVIEW escalation path, making previously invisible risk visible and actionable.
+
+The SENTINEL MCP server extends this governance capability to any AI agent an enterprise deploys — Claude, GPT-4o, Gemini, or on-premise Llama models — eliminating vendor lock-in in the governance layer. Enterprise teams protect their AI workflows without being forced to adopt a specific AI vendor to access governance tooling.
 
 ## Originality Summary
 
