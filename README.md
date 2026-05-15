@@ -8,7 +8,7 @@ It does not replace Lobster Trap. Lobster Trap remains the inline policy enforce
 
 ## Hackathon Submission Placeholders
 
-- **GitHub Repository URL:** `TODO: add public GitHub repository URL`
+- **GitHub Repository URL:** `https://github.com/EVERYTHINGAICO/sentinel-ai-governance`
 - **Demo Application Platform:** `TODO: add hosting platform, e.g. GitHub Pages or Vercel`
 - **Demo Application URL:** `TODO: add hosted demo URL`
 - **Video Presentation URL:** `TODO: add video URL in lablab.ai submission`
@@ -27,6 +27,8 @@ It does not replace Lobster Trap. Lobster Trap remains the inline policy enforce
 - **Gemini validation harness:** structured Gemini output validation under `research/gemini-validation/`.
 - **SENTINEL wrapper:** static replay-based judge demo under `sentinel-wrapper/`.
 - **Submission assets:** demo script, copy, slides outline, and deployment checklist under `submission/`.
+- **SENTINEL MCP server:** standards-compliant MCP server under `sentinel-mcp/` exposing 10 governance tools, compatible with Claude, GPT-4o, Gemini, Llama/Ollama, and any MCP client.
+- **Claude Code skill:** `/sentinel` slash command under `.claude/commands/` for guided step-by-step usage.
 
 ## Upstream Repository
 
@@ -45,7 +47,46 @@ The public demo is intentionally replay-based for hackathon reliability.
 - The static UI reads `sentinel-wrapper/data/scenarios.json`.
 - No API key is required for the hosted replay demo.
 
-## Run the Static Demo Locally
+## Quick Start with MCP (Recommended)
+
+The SENTINEL MCP server exposes the full workflow as callable tools for any AI assistant.
+
+**Step 1 — Install dependencies:**
+
+```bash
+pip install -r sentinel-mcp/requirements.txt
+```
+
+**Step 2 — Use with Claude Code:**
+
+The server is pre-registered for this project. Open the project in Claude Code and type:
+
+```
+/sentinel
+```
+
+This gives you guided, step-by-step access to every phase of SENTINEL.
+
+**Step 3 — Use with any other AI client (Cursor, GPT-4o, Gemini, Llama...):**
+
+See [`sentinel-mcp/README.md`](sentinel-mcp/README.md) for registration snippets for 12 clients.
+
+### Available MCP Tools
+
+| Tool | What it does |
+|------|-------------|
+| `sentinel_status` | Check prerequisites and project state |
+| `sentinel_setup` | Clone Lobster Trap, create .env |
+| `sentinel_configure` | Manage API keys and config |
+| `sentinel_run_suite` | Phase 1: governance test suite |
+| `sentinel_run_gemini` | Phase 2: Gemini recommendations |
+| `sentinel_build_dataset` | Build scenarios.json |
+| `sentinel_serve` | Start web UI at localhost:8787 |
+| `sentinel_inspect_scenarios` | Read scenario data |
+| `sentinel_run_pipeline` | Run everything end-to-end |
+| `sentinel_deploy` | Build GitHub Pages static site |
+
+## Run Manually (Alternative)
 
 ```bash
 python3 sentinel-wrapper/scripts/build_dataset.py
@@ -97,13 +138,28 @@ The ambiguous case is the core demo moment: SENTINEL adds governance review abov
 ## Limitations
 
 - Hosted demo is static/replay-based.
-- No production authentication, RBAC, database, SIEM, Slack, Jira, or MCP installer is included.
+- No production authentication, RBAC, persistent database, SIEM, Slack, or Jira integration is included.
 - Live Lobster Trap and Gemini execution are local validation workflows, not required for the public static demo.
 - Operator workflow state is local browser state.
+
+## AI Client Compatibility
+
+The SENTINEL MCP server works with any MCP-compatible AI client:
+
+**Cloud AI**
+- Claude (Claude Desktop, Claude Code, Cursor, Windsurf)
+- GPT-4o / o3 (ChatGPT Desktop, OpenAI Agents SDK)
+- Gemini 2.x (Google AI Studio, Google ADK)
+
+**Local AI via Ollama**
+- Llama 3.1+ (Jan.ai, LM Studio, Continue.dev, Open WebUI)
+- Mistral, Phi, Qwen — any model with tool-calling support
+
+See [`sentinel-mcp/README.md`](sentinel-mcp/README.md) for setup instructions per client.
 
 ## Future Vision
 
 - Optional live Lobster Trap event feed.
 - Optional persistent review queue.
-- Optional MCP/CLI installer so teams can bootstrap Lobster Trap + SENTINEL validation workflows quickly.
+- MCP server extended with live Lobster Trap event polling (currently replay-based).
 - Optional enterprise integrations after the hackathon prototype.
