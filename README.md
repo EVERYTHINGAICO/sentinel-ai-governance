@@ -1,5 +1,7 @@
 # SENTINEL
 
+![SENTINEL — AI Agent Governance above Lobster Trap Enforcement](assets/sentinel-banner.png)
+
 SENTINEL is an AI agent governance workflow and audit intelligence layer built above Veea Lobster Trap enforcement.
 
 It does not replace Lobster Trap. Lobster Trap remains the inline policy enforcement engine; SENTINEL turns enforcement outcomes, metadata, and Gemini-generated reasoning into a judge-facing governance workflow.
