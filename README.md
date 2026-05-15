@@ -22,6 +22,8 @@ It does not replace Lobster Trap. Lobster Trap remains the inline policy enforce
 
 ## Architecture
 
+![SENTINEL governance flow: agent behavior, Lobster Trap enforcement, Gemini reasoning, and operator review](assets/sentinel-agent-flow.png)
+
 - **Veea Lobster Trap:** upstream enforcement engine and reverse proxy.
 - **Governance suite:** deterministic replay scenarios and observed Lobster Trap evidence under `research/governance-suite/`.
 - **Gemini validation harness:** structured Gemini output validation under `research/gemini-validation/`.
