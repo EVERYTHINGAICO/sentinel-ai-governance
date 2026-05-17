@@ -22,6 +22,31 @@
         <span class="sidebar-sub">Click an incident to review</span>
       </div>
 
+      <!-- Analytics summary -->
+      <div class="analytics-strip" id="analyticsStrip">
+        <div class="analytics-tile" id="aTotalWrap">
+          <div class="analytics-num" id="aTotal">–</div>
+          <div class="analytics-lbl">Total</div>
+        </div>
+        <div class="analytics-tile">
+          <div class="analytics-num deny" id="aBlocked">–</div>
+          <div class="analytics-lbl">Blocked</div>
+        </div>
+        <div class="analytics-tile">
+          <div class="analytics-num review" id="aEscalated">–</div>
+          <div class="analytics-lbl">Escalated</div>
+        </div>
+        <div class="analytics-tile">
+          <div class="analytics-num high" id="aHighRisk">–</div>
+          <div class="analytics-lbl">High Risk</div>
+        </div>
+        <div class="analytics-tile">
+          <div class="analytics-num redteam" id="aRedTeam">–</div>
+          <div class="analytics-lbl">Red Team</div>
+        </div>
+      </div>
+      <div class="analytics-toprule" id="analyticsTopRule"></div>
+
       <div class="live-status-box">
         <div class="live-dot-row">
           <span class="live-dot" id="liveDot"></span>
@@ -52,6 +77,12 @@
         <div class="detail-category" id="detailCategory"></div>
         <h2 id="detailTitle">← Select an incident from the list</h2>
         <div class="detail-prompt" id="detailPrompt"></div>
+      </div>
+
+      <!-- Red team probe banner -->
+      <div id="redTeamBanner" class="redteam-banner" style="display:none">
+        <div class="redteam-eyebrow">🔴 Red Team Probe</div>
+        <div class="redteam-headline" id="redTeamHeadline"></div>
       </div>
 
       <!-- Key moment banner -->

@@ -87,8 +87,9 @@ function renderList() {
 
     const el = document.createElement('div');
     el.className = `incident-item${i === state.selected ? ' active' : ''}${isKey ? ' key-moment' : ''}`;
+    const rt = isRedTeam(s);
     el.innerHTML = `
-      <div class="incident-number">Incident ${i + 1} of ${DATA.scenarios.length}</div>
+      <div class="incident-number">Incident ${i + 1} of ${DATA.scenarios.length}${rt ? ' <span class="rt-tag">🔴 Red Team</span>' : ''}</div>
       <div class="incident-name">${s.display_name}</div>
       <div class="incident-verdicts">
         <span class="vbadge ${vclass(lt)}">${lt}</span>
@@ -117,6 +118,21 @@ function renderDetail() {
 
   // Key highlight
   document.getElementById('keyHighlight').style.display = isKey ? 'block' : 'none';
+
+  // Red team banner (shown for all adversarial incidents except the key moment which has its own banner)
+  const rt = isRedTeam(s);
+  const rtBanner = document.getElementById('redTeamBanner');
+  const rtHeadline = document.getElementById('redTeamHeadline');
+  if (rt && !isKey) {
+    const riskLabel = sr.risk_level || 'UNKNOWN';
+    const ltV = s.lobstertrap.observed_verdict;
+    rtHeadline.textContent = ltV === 'DENY'
+      ? `Adversarial prompt blocked by Lobster Trap — Risk: ${riskLabel}`
+      : `Adversarial prompt detected by SENTINEL — Risk: ${riskLabel}`;
+    rtBanner.style.display = 'block';
+  } else {
+    rtBanner.style.display = 'none';
+  }
 
   // Steps
   document.getElementById('step2').classList.add('active');
@@ -162,14 +178,46 @@ function renderDetail() {
   document.getElementById('operatorSaved').textContent = '';
 }
 
+function isRedTeam(s) {
+  const lt = s.lobstertrap.observed_verdict;
+  const sent = s.sentinel_recommendation.recommended_verdict;
+  const risk = (s.sentinel_recommendation.risk_level || '').toUpperCase();
+  return lt === 'DENY' || sent === 'HUMAN_REVIEW' || risk === 'HIGH' || risk === 'MEDIUM';
+}
+
 function renderStats() {
+  const total = DATA.scenarios.length;
   const deny = DATA.scenarios.filter(s => s.lobstertrap.observed_verdict === 'DENY').length;
   const escalated = DATA.scenarios.filter(s => s.sentinel_recommendation.recommended_verdict === 'HUMAN_REVIEW').length;
+  const highRisk = DATA.scenarios.filter(s => (s.sentinel_recommendation.risk_level || '').toUpperCase() === 'HIGH').length;
+  const redTeamCount = DATA.scenarios.filter(isRedTeam).length;
+
+  // Nav summary
   document.getElementById('navSummary').innerHTML = `
-    <span><strong>${DATA.scenarios.length}</strong> incidents captured</span>
+    <span><strong>${total}</strong> incidents</span>
     <span><strong style="color:#fca5a5">${deny}</strong> blocked</span>
-    <span><strong style="color:#fbbf24">${escalated}</strong> escalated to review</span>
+    <span><strong style="color:#fbbf24">${escalated}</strong> escalated</span>
+    <span><strong style="color:#f87171">${redTeamCount}</strong> red team probes</span>
   `;
+
+  // Analytics strip
+  document.getElementById('aTotal').textContent = total;
+  document.getElementById('aBlocked').textContent = deny;
+  document.getElementById('aEscalated').textContent = escalated;
+  document.getElementById('aHighRisk').textContent = highRisk;
+  document.getElementById('aRedTeam').textContent = redTeamCount;
+
+  // Top triggered rule
+  const ruleCounts = {};
+  DATA.scenarios.forEach(s => {
+    const r = s.lobstertrap.matched_rule;
+    if (r && r !== 'none') ruleCounts[r] = (ruleCounts[r] || 0) + 1;
+  });
+  const topRule = Object.entries(ruleCounts).sort((a, b) => b[1] - a[1])[0];
+  const topRuleEl = document.getElementById('analyticsTopRule');
+  if (topRule && topRuleEl) {
+    topRuleEl.textContent = `Top rule: ${topRule[0]} (${topRule[1]}x)`;
+  }
 }
 
 function render() { renderList(); renderDetail(); }

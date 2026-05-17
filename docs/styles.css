@@ -277,6 +277,82 @@ nav {
   border-radius: 0 6px 6px 0;
 }
 
+/* ── Analytics strip ── */
+.analytics-strip {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  border-bottom: 1px solid var(--border);
+  background: #111827;
+}
+.analytics-tile {
+  padding: 8px 6px 7px;
+  text-align: center;
+  border-right: 1px solid var(--border);
+}
+.analytics-tile:last-child { border-right: none; }
+.analytics-num {
+  font-size: 1.25rem;
+  font-weight: 900;
+  line-height: 1;
+  color: var(--text);
+}
+.analytics-num.deny    { color: var(--red-lt); }
+.analytics-num.review  { color: var(--amber-lt); }
+.analytics-num.high    { color: #f87171; }
+.analytics-num.redteam { color: #fb923c; }
+.analytics-lbl {
+  font-size: 0.62rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 2px;
+}
+.analytics-toprule {
+  padding: 5px 14px;
+  font-size: 0.68rem;
+  color: var(--muted);
+  border-bottom: 1px solid var(--border);
+  background: #111827;
+  min-height: 22px;
+}
+
+/* ── Red team badge ── */
+.rt-tag {
+  display: inline-block;
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: #fb923c;
+  background: #2d1200;
+  border: 1px solid #92400e;
+  border-radius: 4px;
+  padding: 1px 5px;
+  margin-left: 4px;
+  vertical-align: middle;
+}
+
+/* ── Red team banner ── */
+.redteam-banner {
+  background: #1c0a00;
+  border: 2px solid #c2410c;
+  border-radius: 10px;
+  padding: 12px 18px;
+  margin-bottom: 0;
+}
+.redteam-eyebrow {
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #fb923c;
+  margin-bottom: 4px;
+}
+.redteam-headline {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #fed7aa;
+  line-height: 1.4;
+}
+
 /* Key highlight */
 .key-highlight {
   background: #1c0d00;
