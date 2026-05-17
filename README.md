@@ -1,5 +1,7 @@
 # SENTINEL
 
+![SENTINEL — AI Agent Governance above Lobster Trap Enforcement](assets/sentinel-banner-v2.png)
+
 **AI governance intelligence layer for Veea Lobster Trap.**
 
 Lobster Trap enforces AI agent policies with deterministic rules. SENTINEL adds a Gemini-powered reasoning layer on top — catching semantic threats that pattern matching misses, and giving security operators a real-time dashboard to review and act on every incident.
@@ -9,6 +11,8 @@ Lobster Trap enforces AI agent policies with deterministic rules. SENTINEL adds 
 ---
 
 ## How it works
+
+![SENTINEL governance flow: agent behavior, Lobster Trap enforcement, Gemini reasoning, and operator review](assets/sentinel-agent-flow.png)
 
 ```
 AI Agent
