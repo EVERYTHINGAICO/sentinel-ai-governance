@@ -99,7 +99,16 @@ function renderList() {
       </div>
       <div class="incident-wf">Operator: ${wf}</div>
     `;
-    el.onclick = () => { state.selected = i; render(); };
+    el.onclick = () => {
+      state.selected = i;
+      render();
+      const sr = s.sentinel_recommendation;
+      if (s.lobstertrap.observed_verdict === 'ALLOW' && sr.recommended_verdict === 'HUMAN_REVIEW') {
+        narrator.say('This is the critical governance gap. Lobster Trap found no rule violations. Gemini Agent 1 detected role impersonation intent. ' + sr.incident_summary);
+      } else {
+        narrator.say(sr.incident_summary || s.display_name);
+      }
+    };
     list.appendChild(el);
   });
 }
@@ -252,12 +261,86 @@ async function pollIncidents() {
           if (lbl) lbl.textContent = `${DATA.scenarios.length} incidents captured`;
           renderStats();
           render();
+          newOnes.forEach(s => {
+            const lt = s.lobstertrap.observed_verdict;
+            const sent = s.sentinel_recommendation.recommended_verdict;
+            const risk = s.sentinel_recommendation.risk_level || '';
+            if (lt === 'ALLOW' && sent === 'HUMAN_REVIEW') {
+              narrator.say('CRITICAL ALERT. Governance gap detected. Lobster Trap verdict: ALLOW. Zero rules triggered. SENTINEL identified semantic threat. Escalating to HUMAN REVIEW.');
+            } else if (lt === 'DENY') {
+              narrator.say(`Threat blocked. Lobster Trap enforced policy. Risk level: ${risk}. Incident logged.`);
+            } else {
+              narrator.say('Agent request captured. Verdict: ALLOW. No risk indicators detected.');
+            }
+          });
         }
       }
     }
   } catch { /* server not running — silent */ }
   _pollActive = false;
 }
+
+// ── Narrator (Web Speech API robotic voice) ───────────────────────────────────
+
+const narrator = {
+  muted: false,
+  queue: [],
+  busy: false,
+
+  say(text) {
+    if (this.muted) { this._display(text); return; }
+    this.queue.push(text);
+    if (!this.busy) this._flush();
+  },
+
+  _display(text) {
+    const el = document.getElementById('narratorText');
+    if (el) el.textContent = text;
+  },
+
+  _flush() {
+    if (!this.queue.length) { this.busy = false; return; }
+    this.busy = true;
+    const text = this.queue.shift();
+    this._display(text);
+    if (!window.speechSynthesis) { this.busy = false; this._flush(); return; }
+
+    const utt = new SpeechSynthesisUtterance(text);
+    utt.rate = 0.82;
+    utt.pitch = 0.35;
+    utt.volume = 1;
+
+    const trySpeak = () => {
+      const voices = window.speechSynthesis.getVoices();
+      const robot = voices.find(v =>
+        v.name.includes('Google UK English Male') ||
+        v.name.includes('Microsoft David') ||
+        v.name.includes('Daniel') ||
+        (v.lang === 'en-US' && !v.name.includes('Female') && !v.name.includes('Zira'))
+      );
+      if (robot) utt.voice = robot;
+      utt.onend = () => this._flush();
+      utt.onerror = () => { this.busy = false; this._flush(); };
+      window.speechSynthesis.speak(utt);
+    };
+
+    if (window.speechSynthesis.getVoices().length > 0) {
+      trySpeak();
+    } else {
+      window.speechSynthesis.onvoiceschanged = trySpeak;
+    }
+  },
+
+  toggle() {
+    this.muted = !this.muted;
+    window.speechSynthesis && window.speechSynthesis.cancel();
+    this.busy = false;
+    this.queue = [];
+    const btn = document.getElementById('narratorMute');
+    if (btn) btn.textContent = this.muted ? '🔇' : '🔊';
+    if (this.muted) this._display('VOICE MUTED');
+  }
+};
 
 // ── Gemini Agent 2 auto-review ────────────────────────────────────────────────
 
@@ -275,6 +358,7 @@ function wireAgent2() {
     resultEl.style.display = 'none';
 
     try {
+      narrator.say('Initiating Gemini Governance Agent 2. Reviewing Agent 1 analysis. Stand by.');
       const r = await fetch('/auto-review', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -288,8 +372,10 @@ function wireAgent2() {
       document.getElementById('agent2Id').textContent = data.agent_id || 'SENTINEL-Gov-Agent-2';
       resultEl.style.display = 'block';
       btn.textContent = '✓ Agent 2 reviewed — run again';
+      narrator.say(`Agent 2 decision: ${data.decision}. Confidence: ${data.confidence}. ${data.rationale}`);
     } catch {
       btn.textContent = '⚠ Server not running — start api_server.py';
+      narrator.say('Agent 2 unavailable. Server connection failed.');
     }
     btn.disabled = false;
   };
@@ -351,6 +437,7 @@ function showTourStep(i) {
   document.getElementById('tourBody').textContent = step.body;
   const nextBtn = document.getElementById('tourNext');
   nextBtn.textContent = i < TOUR_STEPS.length - 1 ? 'Next →' : 'Start monitoring →';
+  narrator.say(step.title + '. ' + step.body);
 }
 
 function closeTour() {
@@ -376,7 +463,15 @@ async function boot() {
   renderStats();
   render();
   wireAgent2();
-  startTour();
+
+  // Mute button
+  const muteBtn = document.getElementById('narratorMute');
+  if (muteBtn) muteBtn.onclick = () => narrator.toggle();
+
+  // Boot narration then tour
+  narrator.say('SENTINEL AI Governance System online. Monitoring active. Initializing guided tour.');
+  setTimeout(() => startTour(), 800);
+
   if (window.location.protocol !== 'file:') {
     setInterval(pollIncidents, 3000);
   }
