@@ -731,6 +731,8 @@ function showVoicePopup(onTutorial, onSkip) {
 
 async function boot() {
   loadWorkflow();
+  // Demo mode: start with empty dashboard — scenarios arrive one by one after intro
+  if (DEMO_MODE) DATA.scenarios = [];
   renderStats();
   render();
   wireAgent2();
