@@ -258,7 +258,7 @@ async function pollIncidents() {
   if (_pollActive) return;
   _pollActive = true;
   try {
-    const r = await fetch('http://localhost:5001/incidents');
+    const r = await fetch('/incidents');
     if (r.ok) {
       const live = await r.json();
       if (live.length > 0) {
@@ -771,7 +771,7 @@ async function boot() {
     }
   );
 
-  if (window.location.protocol !== 'file:') {
+  if (!DEMO_MODE && window.location.protocol !== 'file:') {
     setInterval(pollIncidents, 3000);
   }
 }
