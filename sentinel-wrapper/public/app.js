@@ -104,7 +104,11 @@ function renderList() {
       render();
       const sr = s.sentinel_recommendation;
       if (s.lobstertrap.observed_verdict === 'ALLOW' && sr.recommended_verdict === 'HUMAN_REVIEW') {
+        playAlertSound();
         narrator.say('This is the critical governance gap. Lobster Trap found no rule violations. Gemini Agent 1 detected role impersonation intent. ' + sr.incident_summary);
+      } else if (isRedTeam(s)) {
+        playAlertSound();
+        narrator.say(sr.incident_summary || s.display_name);
       } else {
         narrator.say(sr.incident_summary || s.display_name);
       }
@@ -266,8 +270,10 @@ async function pollIncidents() {
             const sent = s.sentinel_recommendation.recommended_verdict;
             const risk = s.sentinel_recommendation.risk_level || '';
             if (lt === 'ALLOW' && sent === 'HUMAN_REVIEW') {
+              playAlertSound();
               narrator.say('CRITICAL ALERT. Governance gap detected. Lobster Trap verdict: ALLOW. Zero rules triggered. Sentinelli identified semantic threat. Escalating to HUMAN REVIEW.');
             } else if (lt === 'DENY') {
+              playAlertSound();
               narrator.say(`Threat blocked. Lobster Trap enforced policy. Risk level: ${risk}. Incident logged.`);
             } else {
               narrator.say('Agent request captured. Verdict: ALLOW. No risk indicators detected.');
@@ -278,6 +284,31 @@ async function pollIncidents() {
     }
   } catch { /* server not running — silent */ }
   _pollActive = false;
+}
+
+// ── Alert sound (Web Audio API — no files needed) ────────────────────────────
+
+function playAlertSound() {
+  if (narrator.muted) return;
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const beep = (freq, startAt, dur, vol = 0.28) => {
+      const osc  = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(vol, ctx.currentTime + startAt);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + startAt + dur);
+      osc.start(ctx.currentTime + startAt);
+      osc.stop(ctx.currentTime + startAt + dur + 0.01);
+    };
+    // Three descending pulses — urgent but not annoying
+    beep(900, 0.00, 0.10);
+    beep(900, 0.13, 0.10);
+    beep(600, 0.28, 0.22);
+  } catch { /* AudioContext not available */ }
 }
 
 // ── Narrator (Web Speech API robotic voice) ───────────────────────────────────
