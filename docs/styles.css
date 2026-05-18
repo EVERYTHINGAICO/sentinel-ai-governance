@@ -181,6 +181,9 @@ nav {
   font-size: 0.68rem;
   color: var(--muted);
   border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   text-align: center;
 }
 
@@ -311,6 +314,18 @@ nav {
   border-left: 3px solid var(--teal);
   border-radius: 0 6px 6px 0;
 }
+
+.help-link {
+  font-family: "Share Tech Mono", monospace;
+  font-size: 0.68rem;
+  color: var(--teal);
+  text-decoration: none;
+  border: 1px solid var(--border);
+  padding: 2px 7px;
+  letter-spacing: 0.05em;
+  transition: border-color 0.15s, color 0.15s;
+}
+.help-link:hover { border-color: var(--teal); color: var(--teal-lt); text-shadow: var(--glow); }
 
 /* ── Analytics strip ── */
 .analytics-strip {

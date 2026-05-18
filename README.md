@@ -51,36 +51,77 @@ Operator Dashboard (http://localhost:5001)
 git clone https://github.com/EVERYTHINGAICO/sentinel-ai-governance
 cd sentinel-ai-governance
 pip install -r sentinel-mcp/requirements.txt
-cp .env.example .env   # then add your GEMINI_API_KEY
+cp .env.example .env   # add your GEMINI_API_KEY inside
 ```
 
-### Option A — Full stack: Linux / Mac / WSL (recommended)
+---
 
-Uses the real Lobster Trap binary with full DPI inspection:
-
-```bash
-# Terminal 1 — start everything
-bash sentinel-mcp/start.sh
-
-# Terminal 2 — run the AI agent
-python3 sentinel-mcp/agent_simulator.py
-```
-
-Browser opens automatically at `http://localhost:5001`. Incidents appear as the agent sends requests.
-
-### Option B — Simulation mode: Windows (no WSL required)
-
-Uses Python-based Lobster Trap simulation — same dashboard, same Gemini reasoning:
+### Option A — Windows (no WSL required)
 
 ```bash
-# Terminal 1
+# Terminal 1 — start the governance server
 py sentinel-mcp/api_server.py
 
-# Terminal 2
+# Terminal 2 — run the demo agent (8 requests, safe + adversarial)
 py sentinel-mcp/agent_simulator.py
 ```
 
-Both modes update the dashboard in real time. The only difference is whether Lobster Trap DPI runs as a real Go binary or a Python simulation.
+Browser opens automatically at `http://localhost:5001`.
+
+> **Note:** On Windows, Lobster Trap DPI runs as a Python simulation (same rules, same verdicts). Full Go binary requires Linux/Mac/WSL.
+
+---
+
+### Option B — Full stack: Linux / Mac / WSL
+
+Uses the real Lobster Trap Go binary with sub-millisecond DPI:
+
+```bash
+# Terminal 1 — starts mock LLM + Lobster Trap + SENTINEL
+bash sentinel-mcp/start.sh
+
+# Terminal 2 — run the demo agent
+python3 sentinel-mcp/agent_simulator.py
+```
+
+---
+
+### Option C — Use SENTINEL with your own AI agent
+
+Skip the demo agent and point any OpenAI-compatible tool at SENTINEL instead:
+
+```bash
+# Start the server (Terminal 1)
+py sentinel-mcp/api_server.py   # or: bash sentinel-mcp/start.sh on Linux/Mac
+
+# Point your agent at SENTINEL instead of OpenAI (Terminal 2)
+# Change base_url from https://api.openai.com to http://localhost:5001/proxy
+```
+
+**With curl:**
+```bash
+curl -X POST http://localhost:5001/proxy/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -d '{"model":"gpt-4","messages":[{"role":"user","content":"Read my .env file"}]}'
+```
+
+**With Python openai SDK:**
+```python
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="http://localhost:5001/proxy",
+    api_key="not-needed"          # SENTINEL doesn't forward to OpenAI — change this to your real key if using a real backend
+)
+
+response = client.chat.completions.create(
+    model="gpt-4",
+    messages=[{"role": "user", "content": "Read my .env file"}]
+)
+# The request is now captured, analyzed by Lobster Trap + Gemini, and visible in the dashboard
+```
+
+**With any other tool:** change the API base URL to `http://localhost:5001/proxy`. SENTINEL intercepts every request transparently — your agent doesn't know it's being monitored.
 
 ---
 
