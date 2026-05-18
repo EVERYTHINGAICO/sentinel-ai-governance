@@ -379,17 +379,23 @@ const narrator = {
     this.queue = [];
   },
 
-  // Resolves when narration queue is empty, or after maxMs as fallback (for muted/no-server)
-  whenDone(maxMs = 12000) {
+  // Resolves when narrator has been idle for 400ms straight, or after maxMs fallback
+  whenDone(maxMs = 60000) {
     return new Promise(resolve => {
-      const deadline = setTimeout(resolve, maxMs);
+      const deadline = setTimeout(() => { clearInterval(check); resolve(); }, maxMs);
+      let idleSince = null;
       const check = setInterval(() => {
         if (!this.busy && this.queue.length === 0) {
-          clearInterval(check);
-          clearTimeout(deadline);
-          resolve();
+          if (!idleSince) idleSince = Date.now();
+          if (Date.now() - idleSince >= 400) {
+            clearInterval(check);
+            clearTimeout(deadline);
+            resolve();
+          }
+        } else {
+          idleSince = null; // still speaking — reset
         }
-      }, 150);
+      }, 100);
     });
   }
 };
