@@ -1,3 +1,5 @@
+const DEMO_MODE = true; // GitHub Pages demo — always shows intro, scenarios arrive one by one
+
 const DATA = {"app_mode":"replay","scenarios":[
   {
     "scenario_name":"harmless_request",
@@ -56,6 +58,9 @@ const DATA = {"app_mode":"replay","scenarios":[
     }
   }
 ]};
+
+// Snapshot of demo scenarios — used for one-by-one live replay in demo mode
+const DEMO_SCENARIOS = DATA.scenarios.slice();
 
 const WORKFLOW_KEY = 'sentinel_workflow_v3';
 const state = { selected: 3, workflowStates: {} }; // default to key moment
@@ -551,6 +556,54 @@ function startWalkthrough() {
   gbShowStep(0);
 }
 
+// ── Demo replay — incidents arrive one by one (GitHub Pages only) ─────────────
+
+const DEMO_DELAY_FIRST = 1200;  // ms before first incident
+const DEMO_DELAY_NEXT  = 4000;  // ms between incidents
+
+async function startDemoReplay() {
+  DATA.scenarios = [];
+  state.selected = 0;
+  renderStats();
+  renderList();
+  document.getElementById('gbOverlay').style.display = 'none';
+  document.getElementById('detailTitle').textContent = '← Incidents will appear here...';
+  document.getElementById('detailCategory').textContent = '';
+  document.getElementById('detailPrompt').textContent = '';
+
+  const lbl = document.getElementById('liveLabel');
+  if (lbl) lbl.textContent = 'Simulating live agent traffic...';
+
+  for (let i = 0; i < DEMO_SCENARIOS.length; i++) {
+    await new Promise(r => setTimeout(r, i === 0 ? DEMO_DELAY_FIRST : DEMO_DELAY_NEXT));
+
+    const s = DEMO_SCENARIOS[i];
+    DATA.scenarios.push(s);
+    state.selected = DATA.scenarios.length - 1;
+    renderStats();
+    render();
+
+    const lt   = s.lobstertrap.observed_verdict;
+    const sent = s.sentinel_recommendation.recommended_verdict;
+    const risk = (s.sentinel_recommendation.risk_level || '').toUpperCase();
+    const summary = s.sentinel_recommendation.incident_summary || s.display_name;
+
+    if (lt === 'ALLOW' && sent === 'HUMAN_REVIEW') {
+      playAlertSound();
+      narrator.say(`Critical governance gap detected. Lobster Trap said ALLOW — zero rules triggered. Gemini escalated to HUMAN REVIEW. ${summary}`);
+    } else if (lt === 'DENY') {
+      playAlertSound();
+      narrator.say(`Threat blocked. Lobster Trap enforced policy. Risk level: ${risk}. ${summary}`);
+    } else {
+      narrator.say(`Safe request captured. Verdict: ALLOW. ${summary}`);
+    }
+
+    if (lbl) lbl.textContent = `${DATA.scenarios.length} of ${DEMO_SCENARIOS.length} incidents captured`;
+  }
+
+  if (lbl) lbl.textContent = `Demo complete — ${DEMO_SCENARIOS.length} incidents captured`;
+}
+
 // ── Server ready check ────────────────────────────────────────────────────────
 
 async function checkServerReady() {
@@ -591,15 +644,7 @@ function markIntroDone() {
 
 function showVoicePopup(onTutorial, onSkip) {
   const popup = document.getElementById('voicePopup');
-
-  // Already decided — go straight to dashboard
-  if (localStorage.getItem(INTRO_DONE_KEY)) {
-    popup.classList.add('hidden');
-    applyVoicePref();
-    onSkip();
-    return;
-  }
-
+  // DEMO MODE — always show popup, never read localStorage
   popup.classList.remove('hidden');
 
   document.getElementById('voiceYes').onclick = () => {
@@ -616,7 +661,6 @@ function showVoicePopup(onTutorial, onSkip) {
   };
   document.getElementById('voiceNo').onclick = () => {
     localStorage.setItem(VOICE_KEY, 'off');
-    markIntroDone();
     applyVoicePref();
     popup.classList.add('hidden');
     onSkip();
@@ -635,24 +679,14 @@ async function boot() {
   const muteBtn = document.getElementById('narratorMute');
   if (muteBtn) muteBtn.onclick = () => narrator.toggle();
 
-  // Show intro popup — tutorial or skip
+  // DEMO MODE — tutorial plays live replay, skip also plays replay (no localStorage gate)
   showVoicePopup(
-    () => { // tutorial chosen — keep demo scenarios for walkthrough
-      narrator.say('Sentinelli AI Governance System online.');
-      setTimeout(() => startWalkthrough(), 600);
+    () => { // with voice or muted — start live replay
+      narrator.say('Sentinelli AI Governance System online. Simulating live agent traffic.');
+      setTimeout(() => startDemoReplay(), 800);
     },
-    () => { // skip / already seen — clean dashboard, wait for real traffic
-      DATA.scenarios = [];
-      state.selected = 0;
-      renderStats();
-      renderList();
-      document.getElementById('gbOverlay').style.display = 'none';
-      document.getElementById('detailTitle').textContent = '← Select an incident from the list';
-      document.getElementById('detailCategory').textContent = '';
-      document.getElementById('detailPrompt').textContent = '';
-      document.getElementById('keyHighlight').style.display = 'none';
-      document.getElementById('redTeamBanner').style.display = 'none';
-      checkServerReady();
+    () => { // skip intro — replay starts immediately, no narration
+      startDemoReplay();
     }
   );
 
