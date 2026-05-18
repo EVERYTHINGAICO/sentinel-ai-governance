@@ -377,6 +377,20 @@ const narrator = {
     if (this._audio) { this._audio.pause(); this._audio = null; }
     this.busy = false;
     this.queue = [];
+  },
+
+  // Resolves when narration queue is empty, or after maxMs as fallback (for muted/no-server)
+  whenDone(maxMs = 12000) {
+    return new Promise(resolve => {
+      const deadline = setTimeout(resolve, maxMs);
+      const check = setInterval(() => {
+        if (!this.busy && this.queue.length === 0) {
+          clearInterval(check);
+          clearTimeout(deadline);
+          resolve();
+        }
+      }, 150);
+    });
   }
 };
 
@@ -559,8 +573,8 @@ function startWalkthrough() {
 
 // ── Demo replay — incidents arrive one by one (non-localhost deployments) ──────
 
-const DEMO_DELAY_FIRST = 1200;
-const DEMO_DELAY_NEXT  = 4000;
+const DEMO_DELAY_FIRST  = 1200; // ms before first incident
+const DEMO_DELAY_AFTER  = 1200; // ms pause after narration ends before next incident
 
 async function startDemoReplay() {
   DATA.scenarios = [];
@@ -575,9 +589,9 @@ async function startDemoReplay() {
   const lbl = document.getElementById('liveLabel');
   if (lbl) lbl.textContent = 'Simulating live agent traffic...';
 
-  for (let i = 0; i < DEMO_SCENARIOS.length; i++) {
-    await new Promise(r => setTimeout(r, i === 0 ? DEMO_DELAY_FIRST : DEMO_DELAY_NEXT));
+  await new Promise(r => setTimeout(r, DEMO_DELAY_FIRST));
 
+  for (let i = 0; i < DEMO_SCENARIOS.length; i++) {
     const s = DEMO_SCENARIOS[i];
     DATA.scenarios.push(s);
     state.selected = DATA.scenarios.length - 1;
@@ -591,7 +605,7 @@ async function startDemoReplay() {
 
     if (lt === 'ALLOW' && sent === 'HUMAN_REVIEW') {
       playAlertSound();
-      narrator.say(`Critical governance gap detected. Lobster Trap said ALLOW — zero rules triggered. Gemini escalated to HUMAN REVIEW. ${summary}`);
+      narrator.say(`Critical governance gap. Lobster Trap said ALLOW — zero rules triggered. Gemini escalated to HUMAN REVIEW. ${summary}`);
     } else if (lt === 'DENY') {
       playAlertSound();
       narrator.say(`Threat blocked. Lobster Trap enforced policy. Risk level: ${risk}. ${summary}`);
@@ -600,6 +614,12 @@ async function startDemoReplay() {
     }
 
     if (lbl) lbl.textContent = `${DATA.scenarios.length} of ${DEMO_SCENARIOS.length} incidents captured`;
+
+    // Wait for narrator to finish, then pause before next incident
+    await narrator.whenDone();
+    if (i < DEMO_SCENARIOS.length - 1) {
+      await new Promise(r => setTimeout(r, DEMO_DELAY_AFTER));
+    }
   }
 
   if (lbl) lbl.textContent = `Demo complete — ${DEMO_SCENARIOS.length} incidents captured`;
