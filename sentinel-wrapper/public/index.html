@@ -196,17 +196,18 @@
     <button class="narrator-mute" id="narratorMute" data-tooltip="Mute / unmute voice narration" title="Mute/unmute voice">🔊</button>
   </div>
 
-  <!-- Voice preference popup -->
+  <!-- Intro preference popup -->
   <div id="voicePopup" class="voice-popup-overlay">
     <div class="voice-popup">
       <img src="/assets/sentinelli.png" class="voice-popup-mascot" alt="" />
       <h2 class="voice-popup-title">Welcome to Sentinelli</h2>
-      <p class="voice-popup-sub">Would you like voice narration during the walkthrough?</p>
+      <p class="voice-popup-sub">Want a guided walkthrough of the 4 governance scenarios?</p>
       <div class="voice-popup-buttons">
-        <button class="voice-btn voice-btn-yes" id="voiceYes">🔊 With voice</button>
-        <button class="voice-btn voice-btn-no" id="voiceNo">🔇 Without voice</button>
+        <button class="voice-btn voice-btn-yes" id="voiceYes">🔊 Tutorial with voice</button>
+        <button class="voice-btn voice-btn-mute" id="voiceMute">🔇 Tutorial, no voice</button>
+        <button class="voice-btn voice-btn-no" id="voiceNo">⏭ Skip to dashboard</button>
       </div>
-      <p class="voice-popup-note">Your choice is saved — we won't ask again</p>
+      <p class="voice-popup-note">We'll remember your choice — you can reset it anytime</p>
     </div>
   </div>
 

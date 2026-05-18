@@ -904,18 +904,22 @@ nav {
 }
 .voice-popup-buttons {
   display: flex;
-  gap: 10px;
+  flex-direction: column;
+  gap: 8px;
   margin-top: 4px;
+  width: 100%;
 }
 .voice-btn {
   font-family: inherit;
   font-size: 14px;
   font-weight: 600;
-  padding: 10px 22px;
+  padding: 11px 22px;
   border-radius: var(--radius-sm);
   cursor: pointer;
   border: 1px solid transparent;
   transition: background 0.15s, border-color 0.15s;
+  width: 100%;
+  text-align: center;
 }
 .voice-btn-yes {
   background: var(--primary);
@@ -923,12 +927,19 @@ nav {
   border-color: var(--primary);
 }
 .voice-btn-yes:hover { background: var(--primary-lt); }
-.voice-btn-no {
+.voice-btn-mute {
   background: var(--surface-2);
   color: var(--text);
   border-color: var(--border);
 }
-.voice-btn-no:hover { border-color: var(--muted); }
+.voice-btn-mute:hover { border-color: var(--primary); color: var(--primary-lt); }
+.voice-btn-no {
+  background: transparent;
+  color: var(--muted);
+  border-color: var(--border-sub);
+  font-weight: 500;
+}
+.voice-btn-no:hover { color: var(--text); border-color: var(--border); }
 .voice-popup-note {
   font-size: 11px;
   color: var(--muted);

@@ -537,38 +537,42 @@ async function checkServerReady() {
   }
 }
 
-// ── Voice preference popup ────────────────────────────────────────────────────
+// ── Intro preference popup ────────────────────────────────────────────────────
+// Remembers: 'tutorial+voice' | 'tutorial+mute' | 'skip'
 
 const VOICE_PREF_KEY = 'sentinel_voice_pref';
 
-function showVoicePopup(onDone) {
+function applyVoicePref(pref) {
+  const muted = pref !== 'tutorial+voice';
+  narrator.muted = muted;
+  const muteBtn = document.getElementById('narratorMute');
+  if (muteBtn) muteBtn.textContent = muted ? '🔇' : '🔊';
+}
+
+function showVoicePopup(onTutorial, onSkip) {
   const saved = localStorage.getItem(VOICE_PREF_KEY);
+  const popup = document.getElementById('voicePopup');
+
   if (saved !== null) {
-    narrator.muted = saved === 'off';
-    const muteBtn = document.getElementById('narratorMute');
-    if (muteBtn) muteBtn.textContent = narrator.muted ? '🔇' : '🔊';
-    document.getElementById('voicePopup').classList.add('hidden');
-    onDone();
+    popup.classList.add('hidden');
+    applyVoicePref(saved);
+    if (saved === 'skip') onSkip();
+    else onTutorial();
     return;
   }
 
-  const popup = document.getElementById('voicePopup');
   popup.classList.remove('hidden');
 
-  document.getElementById('voiceYes').onclick = () => {
-    localStorage.setItem(VOICE_PREF_KEY, 'on');
-    narrator.muted = false;
+  const choose = (pref, cb) => {
+    localStorage.setItem(VOICE_PREF_KEY, pref);
+    applyVoicePref(pref);
     popup.classList.add('hidden');
-    onDone();
+    cb();
   };
-  document.getElementById('voiceNo').onclick = () => {
-    localStorage.setItem(VOICE_PREF_KEY, 'off');
-    narrator.muted = true;
-    const muteBtn = document.getElementById('narratorMute');
-    if (muteBtn) muteBtn.textContent = '🔇';
-    popup.classList.add('hidden');
-    onDone();
-  };
+
+  document.getElementById('voiceYes').onclick  = () => choose('tutorial+voice', onTutorial);
+  document.getElementById('voiceMute').onclick  = () => choose('tutorial+mute',  onTutorial);
+  document.getElementById('voiceNo').onclick    = () => choose('skip',            onSkip);
 }
 
 // ── Boot ──────────────────────────────────────────────────────────────────────
@@ -583,11 +587,17 @@ async function boot() {
   const muteBtn = document.getElementById('narratorMute');
   if (muteBtn) muteBtn.onclick = () => narrator.toggle();
 
-  // Show voice preference popup, then start walkthrough
-  showVoicePopup(() => {
-    narrator.say('Sentinelli AI Governance System online.');
-    setTimeout(() => startWalkthrough(), 600);
-  });
+  // Show intro popup — tutorial or skip
+  showVoicePopup(
+    () => { // tutorial chosen
+      narrator.say('Sentinelli AI Governance System online.');
+      setTimeout(() => startWalkthrough(), 600);
+    },
+    () => { // skip chosen — go straight to live dashboard
+      document.getElementById('gbOverlay').style.display = 'none';
+      checkServerReady();
+    }
+  );
 
   if (window.location.protocol !== 'file:') {
     setInterval(pollIncidents, 3000);
