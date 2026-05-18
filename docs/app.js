@@ -125,6 +125,7 @@ function renderList() {
 
 function renderDetail() {
   const s = DATA.scenarios[state.selected];
+  if (!s) return;
   const lt = s.lobstertrap.observed_verdict;
   const sr = s.sentinel_recommendation;
   const sent = sr.recommended_verdict;
