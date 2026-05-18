@@ -606,12 +606,21 @@ async function boot() {
 
   // Show intro popup — tutorial or skip
   showVoicePopup(
-    () => { // tutorial chosen
+    () => { // tutorial chosen — keep demo scenarios for walkthrough
       narrator.say('Sentinelli AI Governance System online.');
       setTimeout(() => startWalkthrough(), 600);
     },
-    () => { // skip chosen — go straight to live dashboard
+    () => { // skip / already seen — clean dashboard, wait for real traffic
+      DATA.scenarios = [];
+      state.selected = 0;
+      renderStats();
+      renderList();
       document.getElementById('gbOverlay').style.display = 'none';
+      document.getElementById('detailTitle').textContent = '← Select an incident from the list';
+      document.getElementById('detailCategory').textContent = '';
+      document.getElementById('detailPrompt').textContent = '';
+      document.getElementById('keyHighlight').style.display = 'none';
+      document.getElementById('redTeamBanner').style.display = 'none';
       checkServerReady();
     }
   );
