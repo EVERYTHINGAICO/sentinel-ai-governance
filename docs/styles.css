@@ -812,13 +812,30 @@ nav {
 .gb-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.55);
+  background: transparent;
   display: flex;
   align-items: flex-end;
   justify-content: center;
   padding-bottom: 60px;
   z-index: 1000;
   cursor: pointer;
+  pointer-events: none;
+}
+.gb-dialog {
+  pointer-events: all;
+}
+
+/* Spotlight highlight on dashboard elements */
+.gb-highlight {
+  outline: 2px solid var(--teal-lt) !important;
+  box-shadow: 0 0 0 4px rgba(0,255,65,0.15), 0 0 20px rgba(0,255,65,0.2) !important;
+  animation: spotlight-pulse 1.5s ease-in-out infinite !important;
+  position: relative;
+  z-index: 500;
+}
+@keyframes spotlight-pulse {
+  0%,100% { box-shadow: 0 0 0 4px rgba(0,255,65,0.15), 0 0 20px rgba(0,255,65,0.2); }
+  50%      { box-shadow: 0 0 0 6px rgba(0,255,65,0.25), 0 0 35px rgba(0,255,65,0.35); }
 }
 .gb-dialog {
   width: min(780px, 92vw);
