@@ -537,6 +537,40 @@ async function checkServerReady() {
   }
 }
 
+// ── Voice preference popup ────────────────────────────────────────────────────
+
+const VOICE_PREF_KEY = 'sentinel_voice_pref';
+
+function showVoicePopup(onDone) {
+  const saved = localStorage.getItem(VOICE_PREF_KEY);
+  if (saved !== null) {
+    narrator.muted = saved === 'off';
+    const muteBtn = document.getElementById('narratorMute');
+    if (muteBtn) muteBtn.textContent = narrator.muted ? '🔇' : '🔊';
+    document.getElementById('voicePopup').classList.add('hidden');
+    onDone();
+    return;
+  }
+
+  const popup = document.getElementById('voicePopup');
+  popup.classList.remove('hidden');
+
+  document.getElementById('voiceYes').onclick = () => {
+    localStorage.setItem(VOICE_PREF_KEY, 'on');
+    narrator.muted = false;
+    popup.classList.add('hidden');
+    onDone();
+  };
+  document.getElementById('voiceNo').onclick = () => {
+    localStorage.setItem(VOICE_PREF_KEY, 'off');
+    narrator.muted = true;
+    const muteBtn = document.getElementById('narratorMute');
+    if (muteBtn) muteBtn.textContent = '🔇';
+    popup.classList.add('hidden');
+    onDone();
+  };
+}
+
 // ── Boot ──────────────────────────────────────────────────────────────────────
 
 async function boot() {
@@ -549,9 +583,11 @@ async function boot() {
   const muteBtn = document.getElementById('narratorMute');
   if (muteBtn) muteBtn.onclick = () => narrator.toggle();
 
-  // Boot narration then Game Boy walkthrough
-  narrator.say('Sentinelli AI Governance System online.');
-  setTimeout(() => startWalkthrough(), 600);
+  // Show voice preference popup, then start walkthrough
+  showVoicePopup(() => {
+    narrator.say('Sentinelli AI Governance System online.');
+    setTimeout(() => startWalkthrough(), 600);
+  });
 
   if (window.location.protocol !== 'file:') {
     setInterval(pollIncidents, 3000);
