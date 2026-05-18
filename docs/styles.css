@@ -946,6 +946,33 @@ nav {
   margin-top: -4px;
 }
 
+/* ── Subtitles ── */
+.subtitle-box {
+  position: fixed;
+  bottom: 52px;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 780px;
+  width: 90%;
+  background: rgba(15, 17, 23, 0.92);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 20px;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text);
+  line-height: 1.55;
+  text-align: center;
+  z-index: 998;
+  backdrop-filter: blur(8px);
+  box-shadow: var(--shadow-md);
+  animation: subtitle-in 0.2s ease;
+}
+@keyframes subtitle-in {
+  from { opacity: 0; transform: translateX(-50%) translateY(6px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
 /* ── Scrollbar ── */
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }

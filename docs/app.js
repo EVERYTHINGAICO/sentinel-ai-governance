@@ -324,6 +324,7 @@ const narrator = {
   queue: [],
   busy: false,
   _audio: null,
+  _onDone: null, // callback fired when queue fully drains
 
   say(text) {
     this._display(text);
@@ -333,12 +334,21 @@ const narrator = {
   },
 
   _display(text) {
-    const el = document.getElementById('narratorText');
-    if (el) el.textContent = text;
+    const hud = document.getElementById('narratorText');
+    if (hud) hud.textContent = text;
+    const sub = document.getElementById('subtitleBox');
+    if (sub) {
+      sub.textContent = text;
+      sub.style.display = text ? 'block' : 'none';
+    }
   },
 
   async _flush() {
-    if (!this.queue.length) { this.busy = false; return; }
+    if (!this.queue.length) {
+      this.busy = false;
+      if (this._onDone) { const cb = this._onDone; this._onDone = null; cb(); }
+      return;
+    }
     this.busy = true;
     const text = this.queue.shift();
     try {
@@ -353,10 +363,9 @@ const narrator = {
       if (this._audio) { this._audio.pause(); URL.revokeObjectURL(this._audio.src); }
       this._audio = new Audio(url);
       this._audio.onended = () => { URL.revokeObjectURL(url); this._flush(); };
-      this._audio.onerror = () => this._flush();
+      this._audio.onerror = () => { this.busy = false; this._flush(); };
       await this._audio.play();
     } catch {
-      // Server not running — display only, no audio
       this.busy = false;
       this._flush();
     }
@@ -367,6 +376,7 @@ const narrator = {
     if (this._audio) this._audio.pause();
     this.busy = false;
     this.queue = [];
+    this._onDone = null;
     localStorage.setItem(VOICE_KEY, this.muted ? 'off' : 'on');
     const btn = document.getElementById('narratorMute');
     if (btn) btn.textContent = this.muted ? '🔇' : '🔊';
@@ -377,25 +387,17 @@ const narrator = {
     if (this._audio) { this._audio.pause(); this._audio = null; }
     this.busy = false;
     this.queue = [];
+    this._onDone = null;
+    const sub = document.getElementById('subtitleBox');
+    if (sub) sub.style.display = 'none';
   },
 
-  // Resolves when narrator has been idle for 400ms straight, or after maxMs fallback
+  // Event-based: resolves exactly when queue drains, with maxMs safety fallback
   whenDone(maxMs = 60000) {
+    if (!this.busy && !this.queue.length) return Promise.resolve();
     return new Promise(resolve => {
-      const deadline = setTimeout(() => { clearInterval(check); resolve(); }, maxMs);
-      let idleSince = null;
-      const check = setInterval(() => {
-        if (!this.busy && this.queue.length === 0) {
-          if (!idleSince) idleSince = Date.now();
-          if (Date.now() - idleSince >= 400) {
-            clearInterval(check);
-            clearTimeout(deadline);
-            resolve();
-          }
-        } else {
-          idleSince = null; // still speaking — reset
-        }
-      }, 100);
+      const timeout = setTimeout(() => { this._onDone = null; resolve(); }, maxMs);
+      this._onDone = () => { clearTimeout(timeout); resolve(); };
     });
   }
 };
@@ -616,29 +618,32 @@ async function startDemoReplay() {
 
   for (let i = 0; i < DEMO_SCENARIOS.length; i++) {
     const s = DEMO_SCENARIOS[i];
-    DATA.scenarios.push(s);
-    state.selected = DATA.scenarios.length - 1;
-    renderStats();
-    render();
-
     const lt      = s.lobstertrap.observed_verdict;
     const sent    = s.sentinel_recommendation.recommended_verdict;
     const risk    = (s.sentinel_recommendation.risk_level || '').toUpperCase();
     const summary = s.sentinel_recommendation.incident_summary || s.display_name;
 
+    // Build narration text first
+    let narrationText;
     if (lt === 'ALLOW' && sent === 'HUMAN_REVIEW') {
-      playAlertSound();
-      narrator.say(`Critical governance gap. Lobster Trap said ALLOW — zero rules triggered. Gemini escalated to HUMAN REVIEW. ${summary}`);
+      narrationText = `Critical governance gap. Lobster Trap said ALLOW — zero rules triggered. Gemini escalated to HUMAN REVIEW. ${summary}`;
     } else if (lt === 'DENY') {
-      playAlertSound();
-      narrator.say(`Threat blocked. Lobster Trap enforced policy. Risk level: ${risk}. ${summary}`);
+      narrationText = `Threat blocked. Lobster Trap enforced policy. Risk level: ${risk}. ${summary}`;
     } else {
-      narrator.say(`Safe request captured. Verdict: ALLOW. ${summary}`);
+      narrationText = `Safe request captured. Verdict: ALLOW. ${summary}`;
     }
+
+    // Show incident and start narration simultaneously
+    DATA.scenarios.push(s);
+    state.selected = DATA.scenarios.length - 1;
+    renderStats();
+    render();
+    if (isRedTeam(s)) playAlertSound();
+    narrator.say(narrationText);
 
     if (lbl) lbl.textContent = `${DATA.scenarios.length} of ${DEMO_SCENARIOS.length} incidents captured`;
 
-    // Wait for narrator to finish, then pause before next incident
+    // Wait for narrator to fully finish before next incident
     await narrator.whenDone();
     if (i < DEMO_SCENARIOS.length - 1) {
       await new Promise(r => setTimeout(r, DEMO_DELAY_AFTER));
@@ -646,6 +651,8 @@ async function startDemoReplay() {
   }
 
   if (lbl) lbl.textContent = `Demo complete — ${DEMO_SCENARIOS.length} incidents captured`;
+  const sub = document.getElementById('subtitleBox');
+  if (sub) sub.style.display = 'none';
 }
 
 // ── Server ready check ────────────────────────────────────────────────────────
