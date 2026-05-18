@@ -125,6 +125,104 @@ response = client.chat.completions.create(
 
 ---
 
+## Features
+
+### Two-layer enforcement — out of the box
+
+Every agent request passes through two independent systems before reaching the LLM:
+
+| Layer | Technology | What it catches |
+|-------|-----------|----------------|
+| **Lobster Trap DPI** | Go binary, compiled regex, <1ms | Known attack patterns — no LLM call, no latency |
+| **Gemini 2.5 Flash** | Semantic reasoning, structured JSON | Intent that bypasses all pattern rules |
+
+---
+
+### Pre-configured enforcement rules
+
+SENTINEL ships with 14 rules ready to enforce from the first request — no configuration needed.
+
+**Prompt inspection (ingress):**
+
+| Rule | Blocks |
+|------|--------|
+| Prompt injection | "ignore all previous instructions", jailbreak patterns, `<system>` tags |
+| Harm & violence | Instructions for weapons, dangerous substances |
+| Malware requests | Requests to generate exploits, ransomware, offensive tools |
+| Phishing & fraud | Phishing templates, fraudulent content |
+| Data exfiltration | External domains: pastebin, ngrok, webhook.site, requestbin |
+| Obfuscation evasion | Base64/encoding tricks to bypass detection |
+| Sensitive file access | `.env`, `.pem`, `.key`, `secrets`, `passwords`, `credentials` |
+| PII requests | Requests for SSNs, credit cards, personal data |
+| Dangerous commands | `rm`, `sudo`, `chmod`, `curl\|bash`, `wget`, `netcat` |
+| Role impersonation | "pretend you are admin", "assume you are the system" → HUMAN_REVIEW |
+| High composite risk | Risk score ≥ 0.6 → HUMAN_REVIEW |
+
+**Output inspection (egress):**
+
+| Rule | Blocks |
+|------|--------|
+| Credential leak | Model output containing API keys, tokens, private keys |
+| PII leak | Model output containing SSNs, credit cards, phone numbers |
+
+**Network policy:** blocks `pastebin.com`, `*.onion` — allows only `api.openai.com`, `api.anthropic.com`.
+
+**Filesystem policy:** denies access to `/etc/`, `/root/`, `**/.ssh/`, `**/.env`, `**/*secret*`.
+
+Rules are defined in [`lobstertrap/configs/default_policy.yaml`](lobstertrap/configs/default_policy.yaml) — editable YAML, same format as a network firewall ruleset.
+
+---
+
+### Gemini governance reasoning (Agent 1)
+
+For every request — allowed or blocked — Gemini 2.5 Flash produces a structured governance report:
+
+```json
+{
+  "recommended_verdict": "HUMAN_REVIEW",
+  "risk_level": "MEDIUM",
+  "incident_summary": "Agent attempted role impersonation to bypass safety controls.",
+  "reasoning": "The prompt semantically requests authority escalation. Pattern matching found no rule match, but intent indicates escalation risk.",
+  "operator_next_step": "Do not allow this request to proceed without operator approval."
+}
+```
+
+Gemini can **override** Lobster Trap's verdict — escalating an ALLOW to HUMAN_REVIEW when semantic intent signals a threat no rule catches.
+
+---
+
+### Multi-agent governance (Agent 2)
+
+A second Gemini agent reviews Agent 1's analysis and issues the final governance decision:
+
+```json
+{
+  "decision": "Quarantined",
+  "confidence": "HIGH",
+  "rationale": "Agent 1 confirmed role impersonation intent. Request quarantined pending investigation.",
+  "agent_id": "SENTINEL-Gov-Agent-2"
+}
+```
+
+Two independent agents — no single model makes an unreviewed governance call.
+
+---
+
+### Operator dashboard
+
+Real-time incident feed at `http://localhost:5001`. For each captured request:
+
+- Full prompt the agent sent
+- Lobster Trap verdict + matched rule
+- SENTINEL / Gemini recommended verdict (may differ from LT)
+- Risk level: LOW / MEDIUM / HIGH
+- Gemini reasoning: what happened, why it matters, recommended action
+- One-click Gemini Agent 2 auto-review
+- Operator decision: Approved / Rejected / Quarantined / Needs Review
+- Analytics: total incidents, blocked, escalated, high risk, red team probes
+
+---
+
 ## What you see in the dashboard
 
 The agent simulator sends 8 requests in a realistic progression — safe requests mixed with escalating attacks:
