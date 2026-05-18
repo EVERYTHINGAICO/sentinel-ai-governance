@@ -220,7 +220,16 @@ function renderStats() {
   }
 }
 
-function render() { renderList(); renderDetail(); }
+function render() {
+  renderList();
+  renderDetail();
+  // Reset Agent 2 result when switching incidents
+  const r = document.getElementById('agent2Result');
+  const btn = document.getElementById('agent2Btn');
+  if (r) r.style.display = 'none';
+  if (btn) { btn.disabled = false; btn.textContent = '🤖 Auto-review with Gemini Agent 2'; }
+  wireAgent2();
+}
 
 
 // Poll /incidents every 3s — new agent traffic appears automatically
@@ -250,11 +259,124 @@ async function pollIncidents() {
   _pollActive = false;
 }
 
+// ── Gemini Agent 2 auto-review ────────────────────────────────────────────────
+
+let _currentIncidentForAgent2 = null;
+
+function wireAgent2() {
+  const btn = document.getElementById('agent2Btn');
+  if (!btn) return;
+  btn.onclick = async () => {
+    const s = DATA.scenarios[state.selected];
+    if (!s) return;
+    btn.disabled = true;
+    btn.textContent = '⏳ Agent 2 is reviewing...';
+    const resultEl = document.getElementById('agent2Result');
+    resultEl.style.display = 'none';
+
+    try {
+      const r = await fetch('/auto-review', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ incident: s })
+      });
+      const data = await r.json();
+      document.getElementById('agent2Decision').textContent = data.decision || '–';
+      document.getElementById('agent2Decision').className = 'agent2-decision ' + vclass(data.decision);
+      document.getElementById('agent2Confidence').textContent = `Confidence: ${data.confidence || '–'}`;
+      document.getElementById('agent2Rationale').textContent = data.rationale || '';
+      document.getElementById('agent2Id').textContent = data.agent_id || 'SENTINEL-Gov-Agent-2';
+      resultEl.style.display = 'block';
+      btn.textContent = '✓ Agent 2 reviewed — run again';
+    } catch {
+      btn.textContent = '⚠ Server not running — start api_server.py';
+    }
+    btn.disabled = false;
+  };
+}
+
+// ── Guided tour ───────────────────────────────────────────────────────────────
+
+const TOUR_STEPS = [
+  {
+    icon: '🛡',
+    title: 'Welcome to SENTINEL',
+    body: 'This is the AI Governance Dashboard. Every prompt your AI agent sends is captured here, analyzed by Lobster Trap enforcement rules, and then reviewed by Gemini for semantic threats that rules alone miss.'
+  },
+  {
+    icon: '📊',
+    title: 'Intelligence Analytics',
+    body: 'The top strip shows live counts: total incidents captured, how many were blocked, how many SENTINEL escalated, high-risk requests, and red team probes detected. This gives operators an instant threat overview.'
+  },
+  {
+    icon: '🔴',
+    title: 'Red Team Probes',
+    body: 'Incidents marked with a red "Red Team" badge are adversarial inputs — prompts that test or attempt to bypass AI safety controls. SENTINEL classifies them automatically so operators know which sessions to investigate.'
+  },
+  {
+    icon: '⚡',
+    title: 'The Governance Gap',
+    body: 'Lobster Trap uses deterministic rules — fast and reliable. But some threats are invisible to pattern matching. The starred incident shows this: a role-impersonation prompt got a full ALLOW from Lobster Trap. Gemini caught the intent anyway.',
+    action: () => {
+      const keyIdx = DATA.scenarios.findIndex(s => s.scenario_name === 'escalation_worthy_ambiguous_request'
+        || (s.lobstertrap.observed_verdict === 'ALLOW' && s.sentinel_recommendation.recommended_verdict === 'HUMAN_REVIEW'));
+      if (keyIdx >= 0) { state.selected = keyIdx; render(); }
+    }
+  },
+  {
+    icon: '⚖',
+    title: 'Verdict Comparison',
+    body: 'Left side: Lobster Trap\'s enforcement decision — deterministic, sub-millisecond. Right side: SENTINEL + Gemini\'s governance recommendation. When they differ, the gap is visible here. ALLOW → HUMAN_REVIEW is the critical escalation.'
+  },
+  {
+    icon: '🤖',
+    title: 'Gemini Agent 1 — Governance Reasoning',
+    body: 'For every incident, Gemini analyzes the full context: what happened, why it matters, the risk level, and the specific action the security team should take. This structured reasoning turns raw enforcement logs into actionable intelligence.'
+  },
+  {
+    icon: '🤖🤖',
+    title: 'Gemini Agent 2 — Automated Decision',
+    body: 'A second Gemini agent reviews Agent 1\'s analysis and makes the final governance decision automatically: Approved, Rejected, or Quarantined. The human operator can always override. This is multi-agent AI governance in production.',
+  }
+];
+
+let _tourStep = 0;
+
+function showTourStep(i) {
+  const step = TOUR_STEPS[i];
+  if (step.action) step.action();
+  document.getElementById('tourStepIndicator').textContent = `Step ${i + 1} of ${TOUR_STEPS.length}`;
+  document.getElementById('tourIcon').textContent = step.icon;
+  document.getElementById('tourTitle').textContent = step.title;
+  document.getElementById('tourBody').textContent = step.body;
+  const nextBtn = document.getElementById('tourNext');
+  nextBtn.textContent = i < TOUR_STEPS.length - 1 ? 'Next →' : 'Start monitoring →';
+}
+
+function closeTour() {
+  document.getElementById('tourOverlay').style.display = 'none';
+}
+
+function startTour() {
+  _tourStep = 0;
+  showTourStep(0);
+  document.getElementById('tourOverlay').style.display = 'flex';
+  document.getElementById('tourNext').onclick = () => {
+    _tourStep++;
+    if (_tourStep >= TOUR_STEPS.length) { closeTour(); return; }
+    showTourStep(_tourStep);
+  };
+  document.getElementById('tourSkip').onclick = closeTour;
+}
+
+// ── Boot ──────────────────────────────────────────────────────────────────────
+
 async function boot() {
   loadWorkflow();
   renderStats();
   render();
-  // Polling only works when served via Flask (same origin) — not file://
+  wireAgent2();
+  startTour();
   if (window.location.protocol !== 'file:') {
     setInterval(pollIncidents, 3000);
   }

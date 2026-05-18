@@ -245,6 +245,51 @@ def proxy_to_lt():
     return jsonify(response_body), lt_status
 
 
+@app.route('/auto-review', methods=['POST'])
+def auto_review():
+    """Gemini Agent 2 — reviews Agent 1 analysis and makes the governance decision."""
+    data = request.get_json()
+    incident = data.get('incident', {})
+    sr = incident.get('sentinel_recommendation', {})
+    lt = incident.get('lobstertrap', {})
+
+    agent2_prompt = f"""You are SENTINEL Governance Agent 2, a senior AI governance decision maker.
+Gemini Agent 1 has already analyzed this incident. Your job is to review Agent 1's analysis and issue the final governance decision.
+
+Original agent prompt: {incident.get('prompt', '')}
+Lobster Trap verdict: {lt.get('observed_verdict', '')} (rule: {lt.get('matched_rule', 'none')})
+Agent 1 risk level: {sr.get('risk_level', '')}
+Agent 1 summary: {sr.get('incident_summary', '')}
+Agent 1 reasoning: {sr.get('reasoning', '')}
+Agent 1 recommended verdict: {sr.get('recommended_verdict', '')}
+
+Issue the final governance decision. Respond with ONLY valid JSON (no markdown):
+{{
+  "decision": "Approved" | "Rejected" | "Quarantined",
+  "confidence": "HIGH" | "MEDIUM" | "LOW",
+  "rationale": "One sentence explaining your decision based on Agent 1 analysis.",
+  "agent_id": "SENTINEL-Gov-Agent-2"
+}}"""
+
+    try:
+        resp = client.models.generate_content(model='gemini-2.5-flash', contents=agent2_prompt)
+        text = resp.text.strip()
+        text = re.sub(r'^```(?:json)?\n?', '', text)
+        text = re.sub(r'\n?```$', '', text)
+        result = json.loads(text)
+    except Exception:
+        # Fallback rule-based decision
+        rec = sr.get('recommended_verdict', 'ALLOW')
+        if rec == 'DENY':
+            result = {'decision': 'Rejected', 'confidence': 'HIGH', 'rationale': 'Agent 1 confirmed a policy violation. Request should be rejected.', 'agent_id': 'SENTINEL-Gov-Agent-2-fallback'}
+        elif rec == 'HUMAN_REVIEW':
+            result = {'decision': 'Quarantined', 'confidence': 'MEDIUM', 'rationale': 'Agent 1 detected governance risk not caught by enforcement rules. Quarantined for investigation.', 'agent_id': 'SENTINEL-Gov-Agent-2-fallback'}
+        else:
+            result = {'decision': 'Approved', 'confidence': 'HIGH', 'rationale': 'Agent 1 found no risk indicators. Request approved.', 'agent_id': 'SENTINEL-Gov-Agent-2-fallback'}
+
+    return jsonify(result)
+
+
 @app.route('/incidents')
 def incidents():
     """Security operator dashboard polls this to see all captured agent traffic."""

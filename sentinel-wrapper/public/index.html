@@ -144,9 +144,29 @@
 
       <!-- Operator decision -->
       <div class="card operator-card">
-        <div class="card-title">Step 3 — Operator Decision</div>
+        <div class="card-title">Step 3 — Governance Decision</div>
         <div class="operator-body">
-          <div class="operator-hint">Review the Gemini reasoning above, then record your decision:</div>
+
+          <!-- Gemini Agent 2 auto-review -->
+          <div class="agent2-panel">
+            <div class="agent2-intro">
+              <strong>Gemini Agent 2</strong> reviews Agent 1's analysis and makes the governance call automatically:
+            </div>
+            <button class="agent2-btn" id="agent2Btn">🤖 Auto-review with Gemini Agent 2</button>
+            <div class="agent2-result" id="agent2Result" style="display:none">
+              <div class="agent2-label">Agent 2 Decision</div>
+              <div class="agent2-decision-row">
+                <span class="agent2-decision" id="agent2Decision"></span>
+                <span class="agent2-confidence" id="agent2Confidence"></span>
+              </div>
+              <div class="agent2-rationale" id="agent2Rationale"></div>
+              <div class="agent2-id">Issued by: <span id="agent2Id"></span></div>
+            </div>
+          </div>
+
+          <div class="operator-divider">— or override manually —</div>
+
+          <div class="operator-hint">Human operator decision:</div>
           <div class="operator-row">
             <select id="reviewState">
               <option value="Needs Review">⏳ Needs Review</option>
@@ -160,6 +180,20 @@
       </div>
 
     </main>
+  </div>
+
+  <!-- Guided tour overlay -->
+  <div id="tourOverlay" class="tour-overlay">
+    <div class="tour-card" id="tourCard">
+      <div class="tour-step-indicator" id="tourStepIndicator"></div>
+      <div class="tour-icon" id="tourIcon"></div>
+      <div class="tour-title" id="tourTitle"></div>
+      <div class="tour-body" id="tourBody"></div>
+      <div class="tour-actions">
+        <button class="tour-skip" id="tourSkip">Skip tour</button>
+        <button class="tour-next" id="tourNext">Next →</button>
+      </div>
+    </div>
   </div>
 
   <script src="app.js"></script>
