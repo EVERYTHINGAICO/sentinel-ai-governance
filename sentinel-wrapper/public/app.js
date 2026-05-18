@@ -408,8 +408,8 @@ const GB_STEPS = [
     verdict: 'HUMAN_REVIEW'
   },
   {
-    header: '▸ WALKTHROUGH COMPLETE',
-    text: 'You have seen the 4 governance scenarios. The dashboard will now clear for live monitoring. Run agent_simulator.py in a second terminal. Watch real incidents appear here in real time — analyzed by Lobster Trap and Gemini together.',
+    header: '▸ TUTORIAL COMPLETE. YOU MAY NOW PANIC.',
+    text: "Great. You sat through four scenarios. Gold star. I'm wiping the dashboard clean now — yes, all of it. Gone. That's the point. From here, SENTINEL monitors whatever your AI agent actually does. If you need setup instructions, there's a README. It has words and everything. If you need that read to you too... honestly, you're already running an AI governance system. Connect the dots.",
     scenarioIdx: null
   }
 ];
@@ -472,7 +472,7 @@ function gbNext() {
     document.getElementById('detailPrompt').textContent = '';
     document.getElementById('keyHighlight').style.display = 'none';
     document.getElementById('redTeamBanner').style.display = 'none';
-    narrator.say('Live monitoring active. Waiting for agent traffic. Run the agent simulator now.');
+    narrator.say('Dashboard cleared. Live monitoring active. Waiting for your AI agent to do something questionable.');
     return;
   }
   gbShowStep(_gbStep);
