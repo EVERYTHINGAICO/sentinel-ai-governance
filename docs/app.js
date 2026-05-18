@@ -330,9 +330,10 @@ const narrator = {
     if (this._audio) this._audio.pause();
     this.busy = false;
     this.queue = [];
+    localStorage.setItem(VOICE_KEY, this.muted ? 'off' : 'on');
     const btn = document.getElementById('narratorMute');
     if (btn) btn.textContent = this.muted ? '🔇' : '🔊';
-    this._display(this.muted ? 'VOICE MUTED' : 'VOICE ACTIVE');
+    this._display(this.muted ? 'Voice muted' : 'Voice active');
   },
 
   stop() {
@@ -487,7 +488,8 @@ function gbNext() {
 
   _gbStep++;
   if (_gbStep >= GB_STEPS.length) {
-    // Close walkthrough, clear static scenarios, start live monitoring
+    // Mark tutorial as seen — never show again
+    markIntroDone();
     document.getElementById('gbOverlay').style.display = 'none';
     document.removeEventListener('keydown', _gbKeyHandler);
     gbClearHighlight();
@@ -538,41 +540,56 @@ async function checkServerReady() {
 }
 
 // ── Intro preference popup ────────────────────────────────────────────────────
-// Remembers: 'tutorial+voice' | 'tutorial+mute' | 'skip'
+// Two independent keys:
+//   sentinel_voice      = 'on' | 'off'
+//   sentinel_intro_done = '1'  (set when tutorial completes or user skips)
 
-const VOICE_PREF_KEY = 'sentinel_voice_pref';
+const VOICE_KEY      = 'sentinel_voice';
+const INTRO_DONE_KEY = 'sentinel_intro_done';
 
-function applyVoicePref(pref) {
-  const muted = pref !== 'tutorial+voice';
-  narrator.muted = muted;
-  const muteBtn = document.getElementById('narratorMute');
-  if (muteBtn) muteBtn.textContent = muted ? '🔇' : '🔊';
+function applyVoicePref() {
+  const on = localStorage.getItem(VOICE_KEY) === 'on';
+  narrator.muted = !on;
+  const btn = document.getElementById('narratorMute');
+  if (btn) btn.textContent = on ? '🔊' : '🔇';
+}
+
+function markIntroDone() {
+  localStorage.setItem(INTRO_DONE_KEY, '1');
 }
 
 function showVoicePopup(onTutorial, onSkip) {
-  const saved = localStorage.getItem(VOICE_PREF_KEY);
   const popup = document.getElementById('voicePopup');
 
-  if (saved !== null) {
+  // Already decided — go straight to dashboard
+  if (localStorage.getItem(INTRO_DONE_KEY)) {
     popup.classList.add('hidden');
-    applyVoicePref(saved);
-    if (saved === 'skip') onSkip();
-    else onTutorial();
+    applyVoicePref();
+    onSkip();
     return;
   }
 
   popup.classList.remove('hidden');
 
-  const choose = (pref, cb) => {
-    localStorage.setItem(VOICE_PREF_KEY, pref);
-    applyVoicePref(pref);
+  document.getElementById('voiceYes').onclick = () => {
+    localStorage.setItem(VOICE_KEY, 'on');
+    applyVoicePref();
     popup.classList.add('hidden');
-    cb();
+    onTutorial();
   };
-
-  document.getElementById('voiceYes').onclick  = () => choose('tutorial+voice', onTutorial);
-  document.getElementById('voiceMute').onclick  = () => choose('tutorial+mute',  onTutorial);
-  document.getElementById('voiceNo').onclick    = () => choose('skip',            onSkip);
+  document.getElementById('voiceMute').onclick = () => {
+    localStorage.setItem(VOICE_KEY, 'off');
+    applyVoicePref();
+    popup.classList.add('hidden');
+    onTutorial();
+  };
+  document.getElementById('voiceNo').onclick = () => {
+    localStorage.setItem(VOICE_KEY, 'off');
+    markIntroDone();
+    applyVoicePref();
+    popup.classList.add('hidden');
+    onSkip();
+  };
 }
 
 // ── Boot ──────────────────────────────────────────────────────────────────────
