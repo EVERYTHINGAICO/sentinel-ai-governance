@@ -329,4 +329,5 @@ if __name__ == '__main__':
         webbrowser.open('http://localhost:5001')
     except Exception:
         pass
-    app.run(port=5001, debug=False)
+    port = int(os.environ.get('PORT', 5001))
+    app.run(host='0.0.0.0', port=port, debug=False)
