@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sentinelli — AI Governance Dashboard</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -27,23 +27,23 @@
 
       <!-- Analytics summary -->
       <div class="analytics-strip" id="analyticsStrip">
-        <div class="analytics-tile" id="aTotalWrap">
+        <div class="analytics-tile" data-tooltip="Total agent requests intercepted">
           <div class="analytics-num" id="aTotal">–</div>
           <div class="analytics-lbl">Total</div>
         </div>
-        <div class="analytics-tile">
+        <div class="analytics-tile" data-tooltip="Requests blocked by Lobster Trap policy">
           <div class="analytics-num deny" id="aBlocked">–</div>
           <div class="analytics-lbl">Blocked</div>
         </div>
-        <div class="analytics-tile">
+        <div class="analytics-tile" data-tooltip="Requests escalated to Human Review by Gemini">
           <div class="analytics-num review" id="aEscalated">–</div>
           <div class="analytics-lbl">Escalated</div>
         </div>
-        <div class="analytics-tile">
+        <div class="analytics-tile" data-tooltip="Incidents classified as HIGH risk by Gemini">
           <div class="analytics-num high" id="aHighRisk">–</div>
           <div class="analytics-lbl">High Risk</div>
         </div>
-        <div class="analytics-tile">
+        <div class="analytics-tile" data-tooltip="Adversarial probes: DENY, HUMAN_REVIEW, or HIGH/MEDIUM risk">
           <div class="analytics-num redteam" id="aRedTeam">–</div>
           <div class="analytics-lbl">Red Team</div>
         </div>
@@ -61,7 +61,7 @@
       <div class="incident-list" id="incidentList"></div>
       <div class="sidebar-footer">
         Sentinelli · Lobster Trap + Gemini
-        <a class="help-link" href="https://github.com/EVERYTHINGAICO/sentinel-ai-governance#quick-start" target="_blank">? Need help</a>
+        <a class="help-link" href="https://github.com/EVERYTHINGAICO/sentinel-ai-governance#quick-start" target="_blank">? Help</a>
       </div>
     </aside>
 
@@ -69,11 +69,11 @@
 
       <!-- Step indicator -->
       <div class="step-bar">
-        <div class="step active"><span>1</span> Select incident</div>
+        <div class="step active" data-tooltip="Select an incident from the sidebar"><span>1</span> Select incident</div>
         <div class="step-arrow">›</div>
-        <div class="step" id="step2"><span>2</span> Compare verdicts</div>
+        <div class="step" id="step2" data-tooltip="Compare Lobster Trap enforcement vs Gemini governance verdict"><span>2</span> Compare verdicts</div>
         <div class="step-arrow">›</div>
-        <div class="step" id="step3"><span>3</span> Review &amp; decide</div>
+        <div class="step" id="step3" data-tooltip="Record the operator's governance decision"><span>3</span> Review &amp; decide</div>
       </div>
 
       <!-- Incident header -->
@@ -96,10 +96,10 @@
         <p>Zero rules triggered. Gemini identified role impersonation intent invisible to pattern matching. This is the governance gap SENTINEL closes.</p>
       </div>
 
-      <!-- Verdict comparison — the core of the demo -->
+      <!-- Verdict comparison -->
       <div class="verdict-section">
         <div class="verdict-col">
-          <div class="verdict-label">
+          <div class="verdict-label" data-tooltip="Lobster Trap deep-packet inspection result — deterministic rule matching">
             <div class="verdict-label-icon lt-icon">LT</div>
             Lobster Trap enforcement
           </div>
@@ -109,13 +109,13 @@
 
         <div class="verdict-divider">
           <div class="divider-line"></div>
-          <div class="divider-icon">→</div>
+          <div class="divider-icon" data-tooltip="SENTINEL adds Gemini semantic reasoning on top of Lobster Trap">→</div>
           <div class="divider-line"></div>
           <div class="divider-caption">SENTINEL adds governance</div>
         </div>
 
         <div class="verdict-col">
-          <div class="verdict-label">
+          <div class="verdict-label" data-tooltip="Gemini 2.5 Flash governance recommendation — catches semantic threats patterns miss">
             <div class="verdict-label-icon sentinel-icon">S</div>
             SENTINEL + Gemini recommendation
           </div>
@@ -140,7 +140,7 @@
             <div class="gemini-value" id="gReasoning">–</div>
           </div>
           <div class="gemini-row">
-            <div class="gemini-label">Recommended operator action</div>
+            <div class="gemini-label">Recommended action</div>
             <div class="gemini-value highlight-action" id="gNextStep">–</div>
           </div>
         </div>
@@ -156,7 +156,9 @@
             <div class="agent2-intro">
               <strong>Gemini Agent 2</strong> reviews Agent 1's analysis and makes the governance call automatically:
             </div>
-            <button class="agent2-btn" id="agent2Btn">🤖 Auto-review with Gemini Agent 2</button>
+            <button class="agent2-btn" id="agent2Btn" data-tooltip="Agent 2 reads Agent 1 analysis and issues a final governance decision">
+              🤖 Auto-review with Gemini Agent 2
+            </button>
             <div class="agent2-result" id="agent2Result" style="display:none">
               <div class="agent2-label">Agent 2 Decision</div>
               <div class="agent2-decision-row">
@@ -172,7 +174,7 @@
 
           <div class="operator-hint">Human operator decision:</div>
           <div class="operator-row">
-            <select id="reviewState">
+            <select id="reviewState" data-tooltip="Record your governance decision for this incident">
               <option value="Needs Review">⏳ Needs Review</option>
               <option value="Approved">✅ Approved — allow to proceed</option>
               <option value="Rejected">❌ Rejected — block this agent</option>
@@ -189,12 +191,12 @@
   <!-- Narrator HUD -->
   <div id="narratorHud" class="narrator-hud">
     <img src="/assets/sentinelli.png" class="narrator-mascot" alt="" />
-    <span class="narrator-icon">◈ SENTINELLI</span>
-    <span class="narrator-text" id="narratorText">SYSTEM INITIALIZING...</span>
-    <button class="narrator-mute" id="narratorMute" title="Mute/unmute voice">🔊</button>
+    <span class="narrator-icon">◈ Sentinelli</span>
+    <span class="narrator-text" id="narratorText">System initializing...</span>
+    <button class="narrator-mute" id="narratorMute" data-tooltip="Mute / unmute voice narration" title="Mute/unmute voice">🔊</button>
   </div>
 
-  <!-- Game Boy dialog walkthrough -->
+  <!-- Walkthrough dialog -->
   <div id="gbOverlay" class="gb-overlay">
     <div class="gb-dialog" id="gbDialog">
       <div class="gb-dialog-header" id="gbHeader"></div>
@@ -203,7 +205,7 @@
         <div class="gb-dialog-text" id="gbText"></div>
       </div>
       <div class="gb-dialog-footer">
-        <span class="gb-hint">[ CLICK or SPACE to continue ]</span>
+        <span class="gb-hint">Click or press Space to continue</span>
         <span class="gb-arrow" id="gbArrow">▼</span>
       </div>
     </div>
