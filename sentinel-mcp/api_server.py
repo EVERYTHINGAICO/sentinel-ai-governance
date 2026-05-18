@@ -19,7 +19,8 @@ except ImportError:
 
 load_dotenv(os.path.join(os.path.dirname(__file__), '..', '.env'))
 
-client = genai.Client(api_key=os.environ['GEMINI_API_KEY'])
+_gemini_key = os.environ.get('GEMINI_API_KEY', '')
+client = genai.Client(api_key=_gemini_key) if _gemini_key else None
 
 app = Flask(__name__)
 CORS(app)
@@ -81,6 +82,8 @@ def gemini_analyze(prompt: str, verdict: str, rule: str, metadata: dict):
         prompt=prompt, verdict=verdict, rule=rule,
         metadata=', '.join(f'{k}=true' for k, v in metadata.items() if v) or 'none'
     )
+    if not client:
+        raise Exception('GEMINI_API_KEY not set')
     resp = client.models.generate_content(model='gemini-2.5-flash', contents=filled)
     text = resp.text.strip()
     text = re.sub(r'^```(?:json)?\n?', '', text)
