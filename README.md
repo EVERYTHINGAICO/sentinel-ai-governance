@@ -88,7 +88,7 @@ python3 sentinel-mcp/agent_simulator.py
 
 ### Option C — Use SENTINEL with your own AI agent
 
-Skip the demo agent and point any OpenAI-compatible tool at SENTINEL instead:
+Skip the demo agent and point any AI agent (Claude, GPT, Gemini, Llama, or any tool) at SENTINEL instead:
 
 ```bash
 # Start the server (Terminal 1)
@@ -177,7 +177,7 @@ For each incident the operator sees:
 
 ## Using SENTINEL with a real AI agent
 
-Any tool that speaks OpenAI-compatible API can route through SENTINEL. Point your agent at `http://localhost:5001/proxy` instead of the real API endpoint.
+Any AI agent — Claude, GPT, Gemini, Llama, or any tool that uses the OpenAI API format can route through SENTINEL. Point your agent at `http://localhost:5001/proxy` instead of the real API endpoint.
 
 **Example with curl:**
 ```bash
