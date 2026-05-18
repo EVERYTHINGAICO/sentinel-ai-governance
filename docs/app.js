@@ -286,9 +286,11 @@ const narrator = {
   muted: false,
   queue: [],
   busy: false,
+  _audio: null,
 
   say(text) {
-    if (this.muted) { this._display(text); return; }
+    this._display(text);
+    if (this.muted) return;
     this.queue.push(text);
     if (!this.busy) this._flush();
   },
@@ -298,47 +300,39 @@ const narrator = {
     if (el) el.textContent = text;
   },
 
-  _flush() {
+  async _flush() {
     if (!this.queue.length) { this.busy = false; return; }
     this.busy = true;
     const text = this.queue.shift();
-    this._display(text);
-    if (!window.speechSynthesis) { this.busy = false; this._flush(); return; }
-
-    const utt = new SpeechSynthesisUtterance(text);
-    utt.rate = 0.82;
-    utt.pitch = 0.35;
-    utt.volume = 1;
-
-    const trySpeak = () => {
-      const voices = window.speechSynthesis.getVoices();
-      const robot = voices.find(v =>
-        v.name.includes('Google UK English Male') ||
-        v.name.includes('Microsoft David') ||
-        v.name.includes('Daniel') ||
-        (v.lang === 'en-US' && !v.name.includes('Female') && !v.name.includes('Zira'))
-      );
-      if (robot) utt.voice = robot;
-      utt.onend = () => this._flush();
-      utt.onerror = () => { this.busy = false; this._flush(); };
-      window.speechSynthesis.speak(utt);
-    };
-
-    if (window.speechSynthesis.getVoices().length > 0) {
-      trySpeak();
-    } else {
-      window.speechSynthesis.onvoiceschanged = trySpeak;
+    try {
+      const r = await fetch('/tts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text })
+      });
+      if (!r.ok) throw new Error('tts failed');
+      const blob = await r.blob();
+      const url = URL.createObjectURL(blob);
+      if (this._audio) { this._audio.pause(); URL.revokeObjectURL(this._audio.src); }
+      this._audio = new Audio(url);
+      this._audio.onended = () => { URL.revokeObjectURL(url); this._flush(); };
+      this._audio.onerror = () => this._flush();
+      await this._audio.play();
+    } catch {
+      // Server not running — display only, no audio
+      this.busy = false;
+      this._flush();
     }
   },
 
   toggle() {
     this.muted = !this.muted;
-    window.speechSynthesis && window.speechSynthesis.cancel();
+    if (this._audio) this._audio.pause();
     this.busy = false;
     this.queue = [];
     const btn = document.getElementById('narratorMute');
     if (btn) btn.textContent = this.muted ? '🔇' : '🔊';
-    if (this.muted) this._display('VOICE MUTED');
+    this._display(this.muted ? 'VOICE MUTED' : 'VOICE ACTIVE');
   }
 };
 

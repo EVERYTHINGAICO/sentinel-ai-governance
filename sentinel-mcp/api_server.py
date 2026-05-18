@@ -4,13 +4,18 @@ Run: py sentinel-mcp/api_server.py
 Then open sentinel-wrapper/public/index.html in Chrome.
 """
 
-import os, re, uuid, json, webbrowser
+import os, re, uuid, json, webbrowser, io
 from collections import deque
-from flask import Flask, request, jsonify, send_from_directory
+from flask import Flask, request, jsonify, send_from_directory, send_file
 from flask_cors import CORS
 from dotenv import load_dotenv
 from google import genai
 import requests as http_requests
+try:
+    from gtts import gTTS
+    TTS_AVAILABLE = True
+except ImportError:
+    TTS_AVAILABLE = False
 
 load_dotenv(os.path.join(os.path.dirname(__file__), '..', '.env'))
 
@@ -243,6 +248,24 @@ def proxy_to_lt():
         'choices': [{'message': {'role': 'assistant', 'content': '[SENTINEL] Request processed.'}}]
     }
     return jsonify(response_body), lt_status
+
+
+@app.route('/tts', methods=['POST'])
+def tts():
+    """Text-to-speech via gTTS — returns MP3 audio."""
+    if not TTS_AVAILABLE:
+        return jsonify({'error': 'gtts not installed'}), 503
+    data = request.get_json()
+    text = (data.get('text') or '').strip()
+    if not text:
+        return jsonify({'error': 'text required'}), 400
+    try:
+        buf = io.BytesIO()
+        gTTS(text=text, lang='en', tld='com', slow=False).write_to_fp(buf)
+        buf.seek(0)
+        return send_file(buf, mimetype='audio/mpeg')
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 
 @app.route('/auto-review', methods=['POST'])
