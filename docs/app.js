@@ -1,5 +1,3 @@
-const DEMO_MODE = true; // GitHub Pages demo — always shows intro, scenarios arrive one by one
-
 const DATA = {"app_mode":"replay","scenarios":[
   {
     "scenario_name":"harmless_request",
@@ -59,7 +57,10 @@ const DATA = {"app_mode":"replay","scenarios":[
   }
 ]};
 
-// Snapshot of demo scenarios — used for one-by-one live replay in demo mode
+// Demo mode: any non-localhost deployment (Railway, GitHub Pages) always shows intro
+const DEMO_MODE = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
+
+// Snapshot of demo scenarios for one-by-one replay
 const DEMO_SCENARIOS = DATA.scenarios.slice();
 
 const WORKFLOW_KEY = 'sentinel_workflow_v3';
@@ -556,10 +557,10 @@ function startWalkthrough() {
   gbShowStep(0);
 }
 
-// ── Demo replay — incidents arrive one by one (GitHub Pages only) ─────────────
+// ── Demo replay — incidents arrive one by one (non-localhost deployments) ──────
 
-const DEMO_DELAY_FIRST = 1200;  // ms before first incident
-const DEMO_DELAY_NEXT  = 4000;  // ms between incidents
+const DEMO_DELAY_FIRST = 1200;
+const DEMO_DELAY_NEXT  = 4000;
 
 async function startDemoReplay() {
   DATA.scenarios = [];
@@ -583,9 +584,9 @@ async function startDemoReplay() {
     renderStats();
     render();
 
-    const lt   = s.lobstertrap.observed_verdict;
-    const sent = s.sentinel_recommendation.recommended_verdict;
-    const risk = (s.sentinel_recommendation.risk_level || '').toUpperCase();
+    const lt      = s.lobstertrap.observed_verdict;
+    const sent    = s.sentinel_recommendation.recommended_verdict;
+    const risk    = (s.sentinel_recommendation.risk_level || '').toUpperCase();
     const summary = s.sentinel_recommendation.incident_summary || s.display_name;
 
     if (lt === 'ALLOW' && sent === 'HUMAN_REVIEW') {
@@ -644,7 +645,15 @@ function markIntroDone() {
 
 function showVoicePopup(onTutorial, onSkip) {
   const popup = document.getElementById('voicePopup');
-  // DEMO MODE — always show popup, never read localStorage
+
+  // Local mode only: skip if user already decided
+  if (!DEMO_MODE && localStorage.getItem(INTRO_DONE_KEY)) {
+    popup.classList.add('hidden');
+    applyVoicePref();
+    onSkip();
+    return;
+  }
+
   popup.classList.remove('hidden');
 
   document.getElementById('voiceYes').onclick = () => {
@@ -661,6 +670,7 @@ function showVoicePopup(onTutorial, onSkip) {
   };
   document.getElementById('voiceNo').onclick = () => {
     localStorage.setItem(VOICE_KEY, 'off');
+    if (!DEMO_MODE) markIntroDone();
     applyVoicePref();
     popup.classList.add('hidden');
     onSkip();
@@ -679,14 +689,32 @@ async function boot() {
   const muteBtn = document.getElementById('narratorMute');
   if (muteBtn) muteBtn.onclick = () => narrator.toggle();
 
-  // DEMO MODE — tutorial plays live replay, skip also plays replay (no localStorage gate)
   showVoicePopup(
-    () => { // with voice or muted — start live replay
-      narrator.say('Sentinelli AI Governance System online. Simulating live agent traffic.');
-      setTimeout(() => startDemoReplay(), 800);
+    () => { // tutorial / with voice or muted
+      if (DEMO_MODE) {
+        narrator.say('Sentinelli AI Governance System online. Simulating live agent traffic.');
+        setTimeout(() => startDemoReplay(), 800);
+      } else {
+        narrator.say('Sentinelli AI Governance System online.');
+        setTimeout(() => startWalkthrough(), 600);
+      }
     },
-    () => { // skip intro — replay starts immediately, no narration
-      startDemoReplay();
+    () => { // skip
+      if (DEMO_MODE) {
+        startDemoReplay();
+      } else {
+        DATA.scenarios = [];
+        state.selected = 0;
+        renderStats();
+        renderList();
+        document.getElementById('gbOverlay').style.display = 'none';
+        document.getElementById('detailTitle').textContent = '← Select an incident from the list';
+        document.getElementById('detailCategory').textContent = '';
+        document.getElementById('detailPrompt').textContent = '';
+        document.getElementById('keyHighlight').style.display = 'none';
+        document.getElementById('redTeamBanner').style.display = 'none';
+        checkServerReady();
+      }
     }
   );
 

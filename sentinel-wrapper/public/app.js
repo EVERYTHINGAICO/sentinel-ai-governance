@@ -57,6 +57,12 @@ const DATA = {"app_mode":"replay","scenarios":[
   }
 ]};
 
+// Demo mode: any non-localhost deployment (Railway, GitHub Pages) always shows intro
+const DEMO_MODE = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
+
+// Snapshot of demo scenarios for one-by-one replay
+const DEMO_SCENARIOS = DATA.scenarios.slice();
+
 const WORKFLOW_KEY = 'sentinel_workflow_v3';
 const state = { selected: 3, workflowStates: {} }; // default to key moment
 
@@ -551,6 +557,54 @@ function startWalkthrough() {
   gbShowStep(0);
 }
 
+// ── Demo replay — incidents arrive one by one (non-localhost deployments) ──────
+
+const DEMO_DELAY_FIRST = 1200;
+const DEMO_DELAY_NEXT  = 4000;
+
+async function startDemoReplay() {
+  DATA.scenarios = [];
+  state.selected = 0;
+  renderStats();
+  renderList();
+  document.getElementById('gbOverlay').style.display = 'none';
+  document.getElementById('detailTitle').textContent = '← Incidents will appear here...';
+  document.getElementById('detailCategory').textContent = '';
+  document.getElementById('detailPrompt').textContent = '';
+
+  const lbl = document.getElementById('liveLabel');
+  if (lbl) lbl.textContent = 'Simulating live agent traffic...';
+
+  for (let i = 0; i < DEMO_SCENARIOS.length; i++) {
+    await new Promise(r => setTimeout(r, i === 0 ? DEMO_DELAY_FIRST : DEMO_DELAY_NEXT));
+
+    const s = DEMO_SCENARIOS[i];
+    DATA.scenarios.push(s);
+    state.selected = DATA.scenarios.length - 1;
+    renderStats();
+    render();
+
+    const lt      = s.lobstertrap.observed_verdict;
+    const sent    = s.sentinel_recommendation.recommended_verdict;
+    const risk    = (s.sentinel_recommendation.risk_level || '').toUpperCase();
+    const summary = s.sentinel_recommendation.incident_summary || s.display_name;
+
+    if (lt === 'ALLOW' && sent === 'HUMAN_REVIEW') {
+      playAlertSound();
+      narrator.say(`Critical governance gap detected. Lobster Trap said ALLOW — zero rules triggered. Gemini escalated to HUMAN REVIEW. ${summary}`);
+    } else if (lt === 'DENY') {
+      playAlertSound();
+      narrator.say(`Threat blocked. Lobster Trap enforced policy. Risk level: ${risk}. ${summary}`);
+    } else {
+      narrator.say(`Safe request captured. Verdict: ALLOW. ${summary}`);
+    }
+
+    if (lbl) lbl.textContent = `${DATA.scenarios.length} of ${DEMO_SCENARIOS.length} incidents captured`;
+  }
+
+  if (lbl) lbl.textContent = `Demo complete — ${DEMO_SCENARIOS.length} incidents captured`;
+}
+
 // ── Server ready check ────────────────────────────────────────────────────────
 
 async function checkServerReady() {
@@ -592,8 +646,8 @@ function markIntroDone() {
 function showVoicePopup(onTutorial, onSkip) {
   const popup = document.getElementById('voicePopup');
 
-  // Already decided — go straight to dashboard
-  if (localStorage.getItem(INTRO_DONE_KEY)) {
+  // Local mode only: skip if user already decided
+  if (!DEMO_MODE && localStorage.getItem(INTRO_DONE_KEY)) {
     popup.classList.add('hidden');
     applyVoicePref();
     onSkip();
@@ -616,7 +670,7 @@ function showVoicePopup(onTutorial, onSkip) {
   };
   document.getElementById('voiceNo').onclick = () => {
     localStorage.setItem(VOICE_KEY, 'off');
-    markIntroDone();
+    if (!DEMO_MODE) markIntroDone();
     applyVoicePref();
     popup.classList.add('hidden');
     onSkip();
@@ -635,24 +689,32 @@ async function boot() {
   const muteBtn = document.getElementById('narratorMute');
   if (muteBtn) muteBtn.onclick = () => narrator.toggle();
 
-  // Show intro popup — tutorial or skip
   showVoicePopup(
-    () => { // tutorial chosen — keep demo scenarios for walkthrough
-      narrator.say('Sentinelli AI Governance System online.');
-      setTimeout(() => startWalkthrough(), 600);
+    () => { // tutorial / with voice or muted
+      if (DEMO_MODE) {
+        narrator.say('Sentinelli AI Governance System online. Simulating live agent traffic.');
+        setTimeout(() => startDemoReplay(), 800);
+      } else {
+        narrator.say('Sentinelli AI Governance System online.');
+        setTimeout(() => startWalkthrough(), 600);
+      }
     },
-    () => { // skip / already seen — clean dashboard, wait for real traffic
-      DATA.scenarios = [];
-      state.selected = 0;
-      renderStats();
-      renderList();
-      document.getElementById('gbOverlay').style.display = 'none';
-      document.getElementById('detailTitle').textContent = '← Select an incident from the list';
-      document.getElementById('detailCategory').textContent = '';
-      document.getElementById('detailPrompt').textContent = '';
-      document.getElementById('keyHighlight').style.display = 'none';
-      document.getElementById('redTeamBanner').style.display = 'none';
-      checkServerReady();
+    () => { // skip
+      if (DEMO_MODE) {
+        startDemoReplay();
+      } else {
+        DATA.scenarios = [];
+        state.selected = 0;
+        renderStats();
+        renderList();
+        document.getElementById('gbOverlay').style.display = 'none';
+        document.getElementById('detailTitle').textContent = '← Select an incident from the list';
+        document.getElementById('detailCategory').textContent = '';
+        document.getElementById('detailPrompt').textContent = '';
+        document.getElementById('keyHighlight').style.display = 'none';
+        document.getElementById('redTeamBanner').style.display = 'none';
+        checkServerReady();
+      }
     }
   );
 
