@@ -333,8 +333,19 @@ const narrator = {
     const btn = document.getElementById('narratorMute');
     if (btn) btn.textContent = this.muted ? '🔇' : '🔊';
     this._display(this.muted ? 'VOICE MUTED' : 'VOICE ACTIVE');
+  },
+
+  stop() {
+    if (this._audio) { this._audio.pause(); this._audio = null; }
+    this.busy = false;
+    this.queue = [];
   }
 };
+
+// Pause narrator when tab is not visible
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) narrator.stop();
+});
 
 // ── Gemini Agent 2 auto-review ────────────────────────────────────────────────
 
@@ -472,7 +483,7 @@ function gbNext() {
     document.getElementById('detailPrompt').textContent = '';
     document.getElementById('keyHighlight').style.display = 'none';
     document.getElementById('redTeamBanner').style.display = 'none';
-    narrator.say('Dashboard cleared. Live monitoring active. Waiting for your AI agent to do something questionable.');
+    checkServerReady();
     return;
   }
   gbShowStep(_gbStep);
@@ -488,6 +499,25 @@ function startWalkthrough() {
   document.getElementById('gbOverlay').onclick = () => gbNext();
   document.addEventListener('keydown', _gbKeyHandler);
   gbShowStep(0);
+}
+
+// ── Server ready check ────────────────────────────────────────────────────────
+
+async function checkServerReady() {
+  const lbl = document.getElementById('liveLabel');
+  const hint = document.querySelector('.live-hint');
+  try {
+    const r = await fetch('/health');
+    if (r.ok) {
+      if (lbl) lbl.textContent = 'SENTINEL online — proxy ready at :5001';
+      if (hint) hint.textContent = 'Point your AI agent at http://localhost:5001/proxy to begin';
+      narrator.say('Server confirmed online. Proxy endpoint active. SENTINEL is ready to intercept agent traffic. Waiting for first request.');
+    }
+  } catch {
+    if (lbl) lbl.textContent = 'Server offline — start api_server.py';
+    if (hint) hint.textContent = 'Run: py sentinel-mcp/api_server.py';
+    narrator.say('Server not detected. Start api server dot py to begin monitoring.');
+  }
 }
 
 // ── Boot ──────────────────────────────────────────────────────────────────────
