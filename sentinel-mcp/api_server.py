@@ -142,6 +142,12 @@ def appjs():
 def styles():
     return send_from_directory(PUBLIC_DIR, 'styles.css')
 
+ASSETS_DIR = os.path.join(os.path.dirname(__file__), '..', 'assets')
+
+@app.route('/assets/<path:filename>')
+def assets(filename):
+    return send_from_directory(ASSETS_DIR, filename)
+
 @app.route('/health')
 def health():
     return jsonify({'status': 'ok', 'model': 'gemini-2.0-flash'})

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SENTINEL — AI Governance Dashboard</title>
+  <title>Sentinelli — AI Governance Dashboard</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css" />
@@ -11,7 +11,8 @@
 <body>
 
   <nav>
-    <div class="nav-brand">SENTI<span>NEL</span></div>
+    <img src="/assets/sentinelli.png" class="nav-mascot" alt="Sentinelli" />
+    <div class="nav-brand">Sentinelli<span>.</span></div>
     <div class="nav-badge" id="modeBadge">AI Governance · Active</div>
     <div class="nav-summary" id="navSummary"></div>
   </nav>
@@ -59,7 +60,7 @@
 
       <div class="incident-list" id="incidentList"></div>
       <div class="sidebar-footer">
-        Powered by Lobster Trap + Gemini
+        Sentinelli · Lobster Trap + Gemini
         <a class="help-link" href="https://github.com/EVERYTHINGAICO/sentinel-ai-governance#quick-start" target="_blank">? Need help</a>
       </div>
     </aside>
@@ -187,7 +188,8 @@
 
   <!-- Narrator HUD -->
   <div id="narratorHud" class="narrator-hud">
-    <span class="narrator-icon">◈ SENTINEL-VOICE</span>
+    <img src="/assets/sentinelli.png" class="narrator-mascot" alt="" />
+    <span class="narrator-icon">◈ SENTINELLI</span>
     <span class="narrator-text" id="narratorText">SYSTEM INITIALIZING...</span>
     <button class="narrator-mute" id="narratorMute" title="Mute/unmute voice">🔊</button>
   </div>
@@ -196,7 +198,10 @@
   <div id="gbOverlay" class="gb-overlay">
     <div class="gb-dialog" id="gbDialog">
       <div class="gb-dialog-header" id="gbHeader"></div>
-      <div class="gb-dialog-text" id="gbText"></div>
+      <div class="gb-dialog-body">
+        <img src="/assets/sentinelli.png" class="gb-mascot" alt="" />
+        <div class="gb-dialog-text" id="gbText"></div>
+      </div>
       <div class="gb-dialog-footer">
         <span class="gb-hint">[ CLICK or SPACE to continue ]</span>
         <span class="gb-arrow" id="gbArrow">▼</span>

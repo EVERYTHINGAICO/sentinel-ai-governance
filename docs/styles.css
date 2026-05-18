@@ -72,6 +72,12 @@ nav {
   text-shadow: var(--glow);
 }
 .nav-brand span { color: #ffffff; text-shadow: 0 0 12px #fff; }
+.nav-mascot {
+  height: 36px;
+  width: auto;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 0 6px rgba(0,255,65,0.4));
+}
 .nav-badge {
   font-size: 0.65rem;
   padding: 3px 10px;
@@ -756,6 +762,12 @@ nav {
   z-index: 999;
   box-shadow: 0 -1px 0 rgba(0,255,65,0.15);
 }
+.narrator-mascot {
+  height: 28px;
+  width: auto;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 0 4px rgba(0,255,65,0.5));
+}
 .narrator-icon {
   font-family: "VT323", monospace;
   font-size: 1rem;
@@ -820,6 +832,24 @@ nav {
   flex-direction: column;
   gap: 10px;
   min-height: 160px;
+}
+.gb-dialog-body {
+  display: flex;
+  gap: 18px;
+  align-items: flex-start;
+  flex: 1;
+}
+.gb-mascot {
+  width: 80px;
+  height: auto;
+  image-rendering: pixelated;
+  flex-shrink: 0;
+  filter: drop-shadow(0 0 8px rgba(0,255,65,0.35));
+  animation: mascot-float 3s ease-in-out infinite;
+}
+@keyframes mascot-float {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
 }
 .gb-dialog-header {
   font-family: "VT323", monospace;
