@@ -11,7 +11,7 @@ It does not replace Lobster Trap enforcement. It interprets Lobster Trap outcome
 
 ## Why Replay-Based Architecture Is Intentional
 
-SENTINEL currently runs in replay mode to maximize demo reliability and traceability during hackathon execution.
+The static demo uses replay artifacts for traceability. A separate local API prototype in `sentinel-mcp/api_server.py` can supply runtime incident analysis and optional Gemini review; see the [root README](../README.md) for its boundaries.
 
 - Source evidence comes from captured Phase 1 Lobster Trap runs.
 - Recommendation outputs come from Phase 2 Gemini-schema validation outputs.
@@ -129,11 +129,17 @@ Replayed:
 ## Limitations and Future Work
 
 Current limitations:
-- replay-only ingestion in UI
-- no shared multi-user persistence
+- static replay mode is distinct from the optional local API mode
+- no shared multi-user persistence; local API incidents are kept in a bounded in-memory log
 - no deployment automation scripts in this phase
 
 Future (post-hackathon) opportunities:
 - optional live Lobster Trap feed mode
 - optional real Gemini inference mode with key-backed runtime
 - minimal backend persistence for team workflows
+
+## Governance Boundary
+
+Observed enforcement verdicts, generated recommendations, and operator labels are distinct evidence. In the current proxy code, the upstream request completes before Gemini analysis. Neither the recommendation nor the browser's workflow state acts as a preventive gate on that request. `Quarantined`, `Rejected`, and `Approved` are review labels unless an external system implements their operational effect.
+
+Gemini-backed and rule-based fallback outputs must be distinguished using their source mode. A captured `ALLOW` versus `HUMAN_REVIEW` scenario is not a guarantee that current policies or fallback rules will produce the same pair of outcomes.
