@@ -68,7 +68,7 @@ py sentinel-mcp/agent_simulator.py
 
 Browser opens automatically at `http://localhost:5001`.
 
-> **Note:** On Windows, Lobster Trap DPI runs as a Python simulation (same rules, same verdicts). Full Go binary requires Linux/Mac/WSL.
+> **Note:** The Python fallback uses a smaller rule simulation; it is not equivalent to the full Lobster Trap policy. See [the fallback rules](sentinel-mcp/api_server.py). The full Go binary requires Linux/Mac/WSL.
 
 ---
 
@@ -140,9 +140,9 @@ Every agent request passes through two independent systems before reaching the L
 
 ### Pre-configured enforcement rules
 
-SENTINEL ships with 14 rules ready to enforce from the first request — no configuration needed.
+The captured full Lobster Trap baseline contains 14 rules: 12 ingress rules and 2 egress rules. Inspect the [baseline policy snapshot](research/baseline/baseline-policy.json) included in this repository.
 
-SENTINEL ships with 14 rules active from the first request. Rules are defined in [`lobstertrap/configs/default_policy.yaml`](lobstertrap/configs/default_policy.yaml) — editable YAML, same logic as a network firewall: priority-ordered, first match wins.
+For a full-stack installation, the editable policy is located at `lobstertrap/configs/default_policy.yaml` inside the separately cloned [official Lobster Trap repository](https://github.com/veeainc/lobstertrap/blob/main/configs/default_policy.yaml). The `lobstertrap/` clone is intentionally excluded from this repository. Rules are priority-ordered, with the first match deciding the action. The Python fallback uses a smaller simulation and does not implement this full policy.
 
 **Prompt inspection (ingress) — 12 rules:**
 
@@ -462,4 +462,6 @@ Lobster Trap is an open source AI security proxy by Veea. SENTINEL builds on top
 
 ## License
 
-MIT
+Original SENTINEL code is licensed under the [MIT License](LICENSE).
+
+Lobster Trap is a separately obtained upstream project. Its code, along with other third-party dependencies and materials, retains its respective license and attribution requirements.
